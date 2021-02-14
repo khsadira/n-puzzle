@@ -238,6 +238,8 @@ func main() {
 			loadCmd(&puzzles, args)
 		case "solve":
 			println("solve", args)
+		case "play":
+			println("play", args)
 		case "credentials":
 			credentialsCmd()
 		case "quit":
