@@ -1,8 +1,9 @@
 package main
 
-import "fmt"
-import "os"
-import "strconv"
+import ("fmt"
+		"os"
+		"strconv"
+)
 
 type taquin struct {
 	taquin [][]uint16
@@ -40,5 +41,8 @@ func main() {
 	i, _ := strconv.ParseInt(os.Args[1], 10, 8);
 	t := generate_taquin(uint8(i))
 	mix_taquin(&t)
+	print_taquin(t)
+	fmt.Println("")
+	solve(&t)
 	print_taquin(t)
 }
