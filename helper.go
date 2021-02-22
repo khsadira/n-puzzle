@@ -46,5 +46,17 @@ func showPuzzle(puzzle taquin) {
 }
 
 func isTaquinSolved(puzzle taquin) bool {
+	var taquinArray []uint16 = convertTaquinToArray(puzzle.taquin)
+	jmp := 0
+
+	for i := 0; i < len(taquinArray)-1; i++ {
+		if taquinArray[i]+1 != taquinArray[i+1] {
+			jmp++
+		}
+	}
+	println(jmp)
+	if jmp > 1 {
+		return false
+	}
 	return true
 }

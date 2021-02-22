@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -100,7 +101,7 @@ func loadCmd(puzzles *[]taquin, args []string) {
 			continue
 		}
 
-		puzzle.ID = arg
+		puzzle.ID = filepath.Base(arg)
 
 		if isValidTaquin(puzzle) {
 			appendPuzzleToPuzzles(puzzles, puzzle)
