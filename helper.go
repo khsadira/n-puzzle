@@ -1,10 +1,27 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 )
+
+func getVoidPosTaquin(taquin [][]uint16, size uint8) ([2]uint8, error) {
+	var voidpos [2]uint8
+	var i, j uint8
+
+	for i = 0; i < size; i++ {
+		for j = 0; j < size; j++ {
+			if taquin[i][j] == 0 {
+				voidpos[0] = i
+				voidpos[1] = j
+				return voidpos, nil
+			}
+		}
+	}
+	return voidpos, errors.New("puzzle not well formatted.")
+}
 
 func appendPuzzleToPuzzles(puzzles *[]taquin, puzzleToAdd taquin) {
 	for _, puzzle := range *puzzles {

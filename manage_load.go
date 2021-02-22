@@ -68,6 +68,7 @@ func convertFileToPuzzle(file *os.File) (taquin, error) {
 	if i != puzzle.size+1 {
 		return puzzle, errors.New("puzzle not well formatted.")
 	}
+
 	return puzzle, nil
 }
 
@@ -91,6 +92,14 @@ func loadCmd(puzzles *[]taquin, args []string) {
 			println("n-puzzle: load:", arg, err.Error())
 			continue
 		}
+
+		puzzle.voidpos, err = getVoidPosTaquin(puzzle.taquin, puzzle.size)
+
+		if err != nil {
+			println("n-puzzle: load:", arg, err.Error())
+			continue
+		}
+
 		puzzle.ID = arg
 
 		if isValidTaquin(puzzle) {

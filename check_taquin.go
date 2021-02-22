@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 func convertTaquinToArray(taquin [][]uint16) []uint16 {
 	var taquinArray []uint16
 
@@ -14,19 +12,30 @@ func convertTaquinToArray(taquin [][]uint16) []uint16 {
 	return taquinArray
 }
 
-func isValidTaquin(puzzle taquin) bool {
-	var taquinArray []uint16 = convertTaquinToArray(puzzle.taquin)
-
+func checkTaquinValues(taquinArray []uint16) bool {
 	for i := range taquinArray {
 		for j := 0; j < i; j++ {
-			if taquinArray[i] == taquinArray[j] {
-				println("n-puzzle:", puzzle.ID, "is unsolvable.1")
-				return false
+			if taquinArray[i] < taquinArray[j] {
+				taquinArray[i], taquinArray[j] = taquinArray[j], taquinArray[i]
 			}
 		}
 	}
 
-	//https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/#:~:text=In%20general%2C%20for%20a%20given,even%20in%20the%20input%20state.&text=the%20blank%20is%20on%20an,fourth%2Dlast%2C%20etc.)
+	jmp := 0
+	for i := 0; i < len(taquinArray)-1; i++ {
+		if taquinArray[i]+1 != taquinArray[i+1] {
+			jmp++
+		}
+	}
+
+	if jmp > 1 {
+		return false
+	}
+
+	return true
+}
+
+func getInversionNumber(taquinArray []uint16) uint16 {
 	var inversion uint16 = 0
 	taquinLen := len(taquinArray)
 
@@ -37,27 +46,40 @@ func isValidTaquin(puzzle taquin) bool {
 			}
 		}
 	}
-	println(inversion)
+
+	return inversion
+}
+
+func checkOddTaquin(inversion uint16) bool {
 	if inversion%2 == 1 {
-		println("n-puzzle:", puzzle.ID, "is unsolvable.2")
+		return false
+	}
+	return true
+}
+
+func checkEvenTaquin(puzzle taquin, inversion uint16) bool {
+	var voidPosRaw uint8 = puzzle.voidpos[0]
+
+	if voidPosRaw%2 == 1 && inversion%2 == 0 || voidPosRaw%2 == 0 && inversion%2 == 1 {
+		return true
+	}
+
+	return false
+}
+
+func isValidTaquin(puzzle taquin) bool {
+	var taquinArray []uint16 = convertTaquinToArray(puzzle.taquin)
+	var inversion uint16 = getInversionNumber(taquinArray)
+
+	if puzzle.size%2 == 1 && !checkOddTaquin(inversion) || puzzle.size%2 == 0 && !checkEvenTaquin(puzzle, inversion) {
+		println("n-puzzle:", puzzle.ID, "is unsolvable.")
 		return false
 	}
 
-	for i := range taquinArray {
-		for j := 0; j < i; j++ {
-			if taquinArray[i] < taquinArray[j] {
-				taquinArray[i], taquinArray[j] = taquinArray[j], taquinArray[i]
-			}
-		}
+	if !checkTaquinValues(taquinArray) {
+		println("n-puzzle:", puzzle.ID, "values are incorrect.")
+		return false
 	}
 
-	for key, value := range taquinArray {
-		if uint16(key) != value {
-			println("n-puzzle:", puzzle.ID, "is unsolvable or already solved.3")
-			return false
-		}
-	}
-
-	fmt.Printf("%v\n", taquinArray)
 	return true
 }
