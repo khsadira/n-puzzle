@@ -1,111 +1,20 @@
 package main
 
 import (
-	"bufio"
-	"errors"
 	"fmt"
-	"os"
-	"strconv"
-	"strings"
 )
 
-func strToMapInt(line string, size uint8) ([]uint16, error) {
-	var err error = nil
-
-	strs := strings.Split(line, " ")
-	strlens := len(strs)
-
-	if uint8(strlens) != size {
-		return nil, errors.New("puzzle not well formatted.")
-	}
-	ary := make([]uint16, strlens)
-
-	for i := range ary {
-		var value64 uint64
-		value64, err = strconv.ParseUint(strs[i], 10, 64)
-		ary[i] = uint16(value64)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return ary, nil
-}
-
-func convertFileToPuzzle(file *os.File) (taquin, error) {
-	var puzzle taquin
-	var err error
-
-	scanner := bufio.NewScanner(file)
-	var i int
-
-	for scanner.Scan() {
-		line := scanner.Text()
-
-		if i == 0 {
-			var size64 uint64
-
-			size64, err = strconv.ParseUint(line, 10, 64)
-
-			if err != nil {
-				return puzzle, errors.New("puzzle not well formatted.")
-			}
-
-			puzzle.size = uint8(size64)
-			puzzle.taquin = make([][]uint16, puzzle.size)
-		} else if uint8(i) > puzzle.size {
-			return puzzle, errors.New("puzzle not well formatted.")
-		} else {
-			puzzle.taquin[i-1], err = strToMapInt(line, puzzle.size)
-
-			if err != nil {
-				return puzzle, errors.New("puzzle not well formatted.")
-			}
-		}
-		i++
-	}
-
-	return puzzle, nil
-}
-
-func loadCmd(puzzles *[]taquin, args []string) {
-	var puzzle taquin
-	var file *os.File
-	var err error
-
+func unloadCmd(puzzles *[]taquin, args []string) {
 	for _, arg := range args {
-		file, err = os.Open(arg)
+		var tmpPuzzles []taquin = *puzzles
 
-		if err != nil {
-			println("n-puzzle: load: error:", err.Error())
-			continue
-		}
-
-		defer file.Close()
-
-		puzzle, err = convertFileToPuzzle(file)
-		if err != nil {
-			println("n-puzzle: load:", arg, err.Error())
-			continue
-		}
-		puzzle.ID = arg
-
-		if checkTaquin(puzzle) {
-			appendPuzzleToPuzzles(puzzles, puzzle)
-		}
-	}
-}
-
-func unloadCmd(puzzles []taquin, args []string) []taquin {
-	for _, arg := range args {
-		for i, puzzle := range puzzles {
+		for i, puzzle := range *puzzles {
 			if puzzle.ID == arg {
-				puzzles = append(puzzles[:i], puzzles[i+1:]...)
+				tmpPuzzles = append(tmpPuzzles[:i], tmpPuzzles[i+1:]...)
 			}
 		}
+		*puzzles = tmpPuzzles
 	}
-	return puzzles
 }
 
 func showCmd(puzzles []taquin, args []string) int {
@@ -121,13 +30,7 @@ func showCmd(puzzles []taquin, args []string) int {
 		for _, puzzle := range puzzles {
 			if puzzle.ID == arg {
 				println(puzzle.size)
-				for i := uint8(0); i < puzzle.size; i++ {
-					var IDs []string
-					for j := uint8(0); j < puzzle.size; j++ {
-						IDs = append(IDs, strconv.Itoa(int(puzzle.taquin[i][j])))
-					}
-					fmt.Println(strings.Join(IDs, " "))
-				}
+				showPuzzle(puzzle)
 			}
 		}
 	}

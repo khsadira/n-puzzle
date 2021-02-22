@@ -17,7 +17,7 @@ func main() {
 	appendPuzzleToPuzzles(&puzzles, createPuzzleTest("n-puzzle-1x1", 1))
 
 	for {
-		cmd, args := getUserEntry()
+		cmd, args := getUserEntry("> ")
 
 		switch cmd {
 		case "help":
@@ -27,11 +27,11 @@ func main() {
 		case "load":
 			loadCmd(&puzzles, args)
 		case "unload":
-			puzzles = unloadCmd(puzzles, args)
+			unloadCmd(&puzzles, args)
 		case "solve":
 			println("solve", args)
 		case "play":
-			println("play", args)
+			playCmd(puzzles, args)
 		case "credentials":
 			credentialsCmd()
 		case "quit":

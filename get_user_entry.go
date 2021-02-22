@@ -7,14 +7,14 @@ import (
 	"strings"
 )
 
-func showPrompt() {
-	print("> ")
+func showPrompt(prompt string) {
+	print(prompt)
 }
 
-func getUserEntry() (string, []string) {
+func getUserEntry(prompt string) (string, []string) {
 	var args []string
 
-	showPrompt()
+	showPrompt(prompt)
 	in := bufio.NewReader(os.Stdin)
 	userEntry, err := in.ReadString('\n')
 
