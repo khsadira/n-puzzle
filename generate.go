@@ -8,7 +8,7 @@ import ("fmt"
 type taquin struct {
 	taquin [][]uint16
 	size uint8
-	voidpos [2]uint8
+	voidpos Vector2D
 }
 
 func print_taquin(t taquin) {
@@ -26,7 +26,7 @@ func generate_taquin(size uint8) taquin {
 	t := taquin{}
 	t.taquin = make([][]uint16, size)
 	t.size = size
-	t.voidpos = [2]uint8{0, 0}
+	t.voidpos = Vector2D{0, 0}
 	for i = 0; i < size; i++ {
 		t.taquin[i] = make([]uint16, size)
 		for j = 0; j < size; j++ {
