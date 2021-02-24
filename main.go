@@ -31,7 +31,7 @@ func main() {
 		case "solve":
 			println("solve", args)
 		case "play":
-			playCmd(puzzles, args)
+			playCmd(&puzzles, args)
 		case "credentials":
 			credentialsCmd()
 		case "quit":
