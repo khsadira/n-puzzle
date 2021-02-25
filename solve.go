@@ -1,11 +1,27 @@
 package main
 
-import "math"
 import "sort"
+import "fmt"
+import "runtime"
+import "math"
+
+func bToMb(b uint64) uint64 {
+    return b / 1024 / 1024
+}
+
+func PrintMemUsage() {
+        var m runtime.MemStats
+        runtime.ReadMemStats(&m)
+        // For info on each, see: https://golang.org/pkg/runtime/#MemStats
+        fmt.Printf("Alloc = %v MiB", bToMb(m.Alloc))
+        fmt.Printf("\tTotalAlloc = %v MiB", bToMb(m.TotalAlloc))
+        fmt.Printf("\tSys = %v MiB", bToMb(m.Sys))
+        fmt.Printf("\tNumGC = %v\n", m.NumGC)
+}
 
 type node struct {
 	pos Vector2D
-	cost, heuristic float64
+	cost, heuristic uint16
 	parent_move int
 	t taquin
 	parent_node *node
@@ -13,11 +29,6 @@ type node struct {
 
 type Vector2D struct {
 	x, y uint8
-}
-
-func distance_to_recquired_pos(cur Vector2D, tar Vector2D) float64 { // perfs a tester, simplifiable
-	var x1, y1, x2, y2 float64 = float64(cur.x), float64(cur.y), float64(tar.x), float64(tar.y)
-	return math.Sqrt(((x1-x2)*(x1-x2))+((y1-y2)*(y1-y2)))
 }
 
 func get_target_pos(val uint16, t *taquin) Vector2D {
@@ -33,34 +44,40 @@ func get_target_pos(val uint16, t *taquin) Vector2D {
 	return Vector2D{x-1, y-1}
 }
 
-func calc_heuristic(t *taquin) float64 { // a opti
-	var x, y uint8
-	var h, c float64 = 0, 0
-
-	for y = 0; y < t.size; y++ {
-		for x = 0; x < t.size; x++ {
-			h += distance_to_recquired_pos(Vector2D{x, y}, get_target_pos(t.taquin[y][x], t))
-			c++
-		}
-	}
-	return h
+func calc_manhattan_distance(p1 Vector2D, p2 Vector2D) uint16 {
+	return uint16(math.Abs(float64(p1.x - p2.x)) + math.Abs(float64(p1.y - p2.y)))
 }
 
-func calc_base_heuristic(t *taquin) float64 {
-	var x, y uint8
-	var h, c float64 = 0, 0
+func calc_heuristic_manhattan_distance(t *taquin) uint16 {
+	var ret uint16 = 0
+	var i, j uint8
+	var val uint16 = 1
 
-	for y = 0; y < t.size; y++ {
-		for x = 0; x < t.size; x++ {
-			h += distance_to_recquired_pos(Vector2D{x, y}, get_target_pos(t.taquin[y][x], t))
-			c++
+	for i = 0; i < t.size; i++ {
+		for j = 0; j < t.size; j++ {
+			if (t.taquin[i][j] != val && t.taquin[i][j] != 0) {
+				ret += calc_manhattan_distance(Vector2D{j, i}, get_target_pos(t.taquin[i][j], t))
+			}
+			val++
 		}
 	}
-	return h
+	return ret
 }
 
-func calc_cost(t *taquin, move int) float64 {
-	return 2.0
+func calc_heuristic_nb_misplaced(t *taquin) uint16 {
+	var ret uint16 = 0
+	var i, j uint8
+	var val uint16 = 1
+
+	for i = 0; i < t.size; i++ {
+		for j = 0; j < t.size; j++ {
+			if (t.taquin[i][j] != val && t.taquin[i][j] != 0) {
+				ret++
+			}
+			val++
+		}
+	}
+	return ret
 }
 
 func not_reverse_move(move int, parent_move int) bool {
@@ -133,7 +150,7 @@ func algo(t *taquin, open_list []node, close_list []node, current_node node) boo
 	for i = 0; i < 4; i++ {
 		if not_reverse_move(i, current_node.parent_move) {
 			if (do_move(i, t)) {
-				new_node = node{t.voidpos, calc_cost(t, i), calc_heuristic(t), i, copy_taquin(*t), &current_node}
+				new_node = node{t.voidpos, current_node.cost + 1, calc_heuristic_manhattan_distance(t), i, copy_taquin(*t), &current_node}
 				do_move(get_reverse_move(i), t)
 				if (!is_node_in_slice(close_list, new_node)) {
 					open_list = append(open_list, new_node)
@@ -145,7 +162,8 @@ func algo(t *taquin, open_list []node, close_list []node, current_node node) boo
 		return (open_list[i].heuristic+open_list[i].cost) < (open_list[j].heuristic+open_list[j].cost)
 	})
 	for i = 0; i < len(open_list); i++ {
-		do_move(open_list[i].parent_move, t)
+		*t = copy_taquin(open_list[i].t)
+		fmt.Println(len(open_list))
 		if (algo(t, open_list, close_list, open_list[i])) {
 			return true
 		}
@@ -173,10 +191,12 @@ func solve(t *taquin) {
 	var n node
 
 	n.cost = 0
-	n.heuristic = calc_base_heuristic(t)
+	n.heuristic = calc_heuristic_manhattan_distance(t)
 	n.parent_move = -1
 	n.pos = t.voidpos
 	n.t = copy_taquin(*t)
 	open_list = append(open_list, n)
+	PrintMemUsage()
 	algo(t, open_list, close_list, n)
+	PrintMemUsage()
 }
