@@ -58,7 +58,7 @@ func checkOddTaquin(inversion uint16) bool {
 }
 
 func checkEvenTaquin(puzzle taquin, inversion uint16) bool {
-	var voidPosRaw uint8 = puzzle.voidpos[0]
+	var voidPosRaw uint8 = puzzle.voidpos.x
 
 	if voidPosRaw%2 == 1 && inversion%2 == 0 || voidPosRaw%2 == 0 && inversion%2 == 1 {
 		return true
