@@ -1,17 +1,12 @@
 package main
 
-import ("fmt"
-		"os"
-		"strconv"
-		"time"
-		"sync"
+import (
+	"fmt"
+	"os"
+	"strconv"
+	"sync"
+	"time"
 )
-
-type taquin struct {
-	taquin [][]uint16
-	size uint8
-	voidpos Vector2D
-}
 
 func print_taquin(t taquin) {
 	var i uint8
@@ -40,8 +35,8 @@ func generate_taquin(size uint8) taquin {
 	return t
 }
 
-func main() {
-	i, _ := strconv.ParseInt(os.Args[1], 10, 8);
+func start() {
+	i, _ := strconv.ParseInt(os.Args[1], 10, 8)
 	t := generate_taquin(uint8(i))
 	mix_taquin(&t)
 	t2 := copy_taquin(t)

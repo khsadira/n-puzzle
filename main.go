@@ -28,6 +28,8 @@ func main() {
 			loadCmd(&puzzles, args)
 		case "unload":
 			unloadCmd(&puzzles, args)
+		case "start":
+			start()
 		case "solve":
 			println("solve", args)
 		case "play":
