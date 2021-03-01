@@ -4,6 +4,8 @@ import "sort"
 import "fmt"
 import "runtime"
 import "math"
+import "time"
+import "sync"
 
 func bToMb(b uint64) uint64 {
     return b / 1024 / 1024
@@ -12,7 +14,6 @@ func bToMb(b uint64) uint64 {
 func PrintMemUsage() {
         var m runtime.MemStats
         runtime.ReadMemStats(&m)
-        // For info on each, see: https://golang.org/pkg/runtime/#MemStats
         fmt.Printf("Alloc = %v MiB", bToMb(m.Alloc))
         fmt.Printf("\tTotalAlloc = %v MiB", bToMb(m.TotalAlloc))
         fmt.Printf("\tSys = %v MiB", bToMb(m.Sys))
@@ -45,7 +46,7 @@ func get_target_pos(val uint16, t *taquin) Vector2D {
 }
 
 func calc_manhattan_distance(p1 Vector2D, p2 Vector2D) uint16 {
-	return uint16(math.Abs(float64(p1.x - p2.x)) + math.Abs(float64(p1.y - p2.y)))
+	return uint16(math.Abs(float64(p1.x) - float64(p2.x)) + math.Abs(float64(p1.y) - float64(p2.y)))
 }
 
 func calc_heuristic_manhattan_distance(t *taquin) uint16 {
@@ -138,33 +139,11 @@ func is_node_in_slice(list []node, n node) bool {
 	return false
 }
 
-func algo(t *taquin, open_list []node, close_list []node, current_node node) bool {
+func is_node_in_slice_with_less_cost(list []node, n node) bool {
 	var i int
-	var new_node node
 
-	if current_node.heuristic == 0.0 {
-		return true
-	}
-	close_list = append(close_list, current_node)
-	open_list = remove_node_from_slice(open_list, current_node)
-	for i = 0; i < 4; i++ {
-		if not_reverse_move(i, current_node.parent_move) {
-			if (do_move(i, t)) {
-				new_node = node{t.voidpos, current_node.cost + 1, calc_heuristic_manhattan_distance(t), i, copy_taquin(*t), &current_node}
-				do_move(get_reverse_move(i), t)
-				if (!is_node_in_slice(close_list, new_node)) {
-					open_list = append(open_list, new_node)
-				}
-			}
-		}
-	}
-	sort.Slice(open_list, func(i, j int) bool {
-		return (open_list[i].heuristic+open_list[i].cost) < (open_list[j].heuristic+open_list[j].cost)
-	})
-	for i = 0; i < len(open_list); i++ {
-		*t = copy_taquin(open_list[i].t)
-		fmt.Println(len(open_list))
-		if (algo(t, open_list, close_list, open_list[i])) {
+	for i = 0; i < len(list); i++ {
+		if are_taquins_equal(&n.t, &list[i].t) && n.cost < list[i].cost {
 			return true
 		}
 	}
@@ -185,18 +164,82 @@ func copy_taquin(t taquin) taquin {
 	return ret
 }
 
-func solve(t *taquin) {
+func solve(t *taquin, wg *sync.WaitGroup) {
 	var open_list []node
 	var close_list []node
-	var n node
+	var n, newn node
+	var i int
 
-	n.cost = 0
-	n.heuristic = calc_heuristic_manhattan_distance(t)
-	n.parent_move = -1
-	n.pos = t.voidpos
-	n.t = copy_taquin(*t)
+	start := time.Now()
+	n = node{t.voidpos, 0, calc_heuristic_manhattan_distance(t), -1, copy_taquin(*t), nil}
 	open_list = append(open_list, n)
+	for n.heuristic != 0 {
+		for i = 0; i < 4; i++ {
+			if (not_reverse_move(i, n.parent_move) && do_move(i, t)) {
+				newn = node{t.voidpos, n.cost+1, calc_heuristic_manhattan_distance(t), i, copy_taquin(*t), &n}
+				if (newn.heuristic == 0) {
+					fmt.Printf("%s: %d\n", "cost", n.cost)
+					PrintMemUsage()
+					fmt.Println(time.Since(start))
+					wg.Done()
+					return
+				}
+				if !(is_node_in_slice(close_list, newn) || is_node_in_slice_with_less_cost(open_list, newn)) {
+					open_list = append(open_list, newn)
+				}
+				do_move(get_reverse_move(i), t)
+			}
+		}
+		close_list = append(close_list, n)
+		open_list = open_list[1:]
+		sort.Slice(open_list, func(i, j int) bool {
+			return (open_list[i].heuristic+open_list[i].cost) < (open_list[j].heuristic+open_list[j].cost)
+		})
+		n = open_list[0]
+		*t = copy_taquin(n.t)
+	}
+	fmt.Printf("%s: %d\n", "cost", n.cost)
 	PrintMemUsage()
-	algo(t, open_list, close_list, n)
+	fmt.Println(time.Since(start))
+	wg.Done()
+}
+
+func solve2(t *taquin, wg *sync.WaitGroup) {
+	var open_list []node
+	var close_list []node
+	var n, newn node
+	var i int
+
+	start := time.Now()
+	n = node{t.voidpos, 0, calc_heuristic_manhattan_distance(t), -1, copy_taquin(*t), nil}
+	open_list = append(open_list, n)
+	for n.heuristic != 0 {
+		for i = 0; i < 4; i++ {
+			if (not_reverse_move(i, n.parent_move) && do_move(i, t)) {
+				newn = node{t.voidpos, n.cost+1, calc_heuristic_manhattan_distance(t), i, copy_taquin(*t), &n}
+				if (newn.heuristic == 0) {
+					fmt.Printf("%s: %d\n", "cost", n.cost)
+					PrintMemUsage()
+					fmt.Println(time.Since(start))
+					wg.Done()
+					return
+				}
+				if !(is_node_in_slice(close_list, newn) || is_node_in_slice_with_less_cost(open_list, newn)) {
+					open_list = append(open_list, newn)
+				}
+				do_move(get_reverse_move(i), t)
+			}
+		}
+		close_list = append(close_list, n)
+		open_list = open_list[1:]
+		sort.Slice(open_list, func(i, j int) bool {
+			return (open_list[i].heuristic+open_list[i].cost) < (open_list[j].heuristic+open_list[j].cost)
+		})
+		n = open_list[0]
+		*t = copy_taquin(n.t)
+	}
+	fmt.Printf("%s: %d\n", "cost", n.cost)
 	PrintMemUsage()
+	fmt.Println(time.Since(start))
+	wg.Done()
 }
