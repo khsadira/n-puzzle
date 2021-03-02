@@ -6,6 +6,7 @@ import "runtime"
 import "math"
 import "time"
 import "sync"
+import "container/heap"
 
 func bToMb(b uint64) uint64 {
     return b / 1024 / 1024
@@ -184,7 +185,7 @@ func solve(t *taquin, wg *sync.WaitGroup) {
 					wg.Done()
 					return
 				}
-				if !(is_node_in_slice(close_list, newn) || is_node_in_slice_with_less_cost(open_list, newn)) {
+				if !(is_node_in_slice(close_list, newn)/* || is_node_in_slice_with_less_cost(open_list, newn)*/) {
 					open_list = append(open_list, newn)
 				}
 				do_move(get_reverse_move(i), t)
@@ -205,15 +206,19 @@ func solve(t *taquin, wg *sync.WaitGroup) {
 }
 
 func solve2(t *taquin, wg *sync.WaitGroup) {
-	var open_list []node
 	var close_list []node
 	var n, newn node
 	var i int
+	var newItem *Item
 
+	open_list := make(PriorityQueue, 1)
 	start := time.Now()
 	n = node{t.voidpos, 0, calc_heuristic_manhattan_distance(t), -1, copy_taquin(*t), nil}
-	open_list = append(open_list, n)
+	open_list[0] = &Item{n, n.heuristic+n.cost, 0}
+	heap.Init(&open_list)
 	for n.heuristic != 0 {
+		n = heap.Pop(&open_list).(*Item).value
+		*t = copy_taquin(n.t)
 		for i = 0; i < 4; i++ {
 			if (not_reverse_move(i, n.parent_move) && do_move(i, t)) {
 				newn = node{t.voidpos, n.cost+1, calc_heuristic_manhattan_distance(t), i, copy_taquin(*t), &n}
@@ -224,19 +229,15 @@ func solve2(t *taquin, wg *sync.WaitGroup) {
 					wg.Done()
 					return
 				}
-				if !(is_node_in_slice(close_list, newn) || is_node_in_slice_with_less_cost(open_list, newn)) {
-					open_list = append(open_list, newn)
+				if !(is_node_in_slice(close_list, newn)/* || is_node_in_slice_with_less_cost(open_list, newn)*/) {
+					newItem = &Item{newn, newn.heuristic+n.cost, 0}
+					heap.Push(&open_list, newItem)
+					open_list.update(newItem, newItem.value, newItem.priority)
 				}
 				do_move(get_reverse_move(i), t)
 			}
 		}
 		close_list = append(close_list, n)
-		open_list = open_list[1:]
-		sort.Slice(open_list, func(i, j int) bool {
-			return (open_list[i].heuristic+open_list[i].cost) < (open_list[j].heuristic+open_list[j].cost)
-		})
-		n = open_list[0]
-		*t = copy_taquin(n.t)
 	}
 	fmt.Printf("%s: %d\n", "cost", n.cost)
 	PrintMemUsage()
