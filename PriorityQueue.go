@@ -1,7 +1,5 @@
 package main
 
-import "container/heap"
-
 type Item struct {
 	value    node
 	priority uint16
@@ -39,10 +37,4 @@ func (pq *PriorityQueue) Pop() interface{} {
 	item.index = -1
 	*pq = old[0 : n-1]
 	return item
-}
-
-func (pq *PriorityQueue) update(item *Item, value node, priority uint16) {
-	item.value = value
-	item.priority = priority
-	heap.Fix(pq, item.index)
 }

@@ -15,12 +15,12 @@ func swap(x1 uint8, y1 uint8, x2 uint8, y2 uint8, t *taquin) {
 	tmp = t.taquin[y1][x1]
 	t.taquin[y1][x1] = t.taquin[y2][x2]
 	t.taquin[y2][x2] = tmp
+	t.voidpos = Vector2D{x2, y2}
 }
 
 func move_left(t *taquin) bool {
-	if (t.voidpos.y < t.size-1) {
-		swap(t.voidpos.y, t.voidpos.x, t.voidpos.y+1, t.voidpos.x, t)
-		t.voidpos.y++
+	if (t.voidpos.x < t.size-1) {
+		swap(t.voidpos.x, t.voidpos.y, t.voidpos.x+1, t.voidpos.y, t)
 		return true
 	} else {
 		return false
@@ -28,9 +28,8 @@ func move_left(t *taquin) bool {
 }
 
 func move_right(t *taquin) bool {
-	if (t.voidpos.y > 0) {
-		swap(t.voidpos.y, t.voidpos.x, t.voidpos.y-1, t.voidpos.x, t)
-		t.voidpos.y--
+	if (t.voidpos.x > 0) {
+		swap(t.voidpos.x, t.voidpos.y, t.voidpos.x-1, t.voidpos.y, t)
 		return true
 	} else {
 		return false
@@ -38,9 +37,8 @@ func move_right(t *taquin) bool {
 }
 
 func move_up(t *taquin) bool {
-	if (t.voidpos.x < t.size-1) {
-		swap(t.voidpos.y, t.voidpos.x, t.voidpos.y, t.voidpos.x+1, t)
-		t.voidpos.x++
+	if (t.voidpos.y < t.size-1) {
+		swap(t.voidpos.x, t.voidpos.y, t.voidpos.x, t.voidpos.y+1, t)
 		return true
 	} else {
 		return false
@@ -48,9 +46,8 @@ func move_up(t *taquin) bool {
 }
 
 func move_down(t *taquin) bool {
-	if (t.voidpos.x > 0) {
-		swap(t.voidpos.y, t.voidpos.x, t.voidpos.y, t.voidpos.x-1, t)
-		t.voidpos.x--
+	if (t.voidpos.y > 0) {
+		swap(t.voidpos.x, t.voidpos.y, t.voidpos.x, t.voidpos.y-1, t)
 		return true
 	} else {
 		return false
@@ -100,6 +97,6 @@ func mix_taquin(t *taquin) {
 		}
 		oldmove = move
 	}
-	for move_down(t) {}
-	for move_right(t) {}
+	for do_move(down, t) {}
+	for do_move(right, t) {}
 }

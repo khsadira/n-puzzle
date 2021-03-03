@@ -1,12 +1,11 @@
 package main
 
-import "sort"
 import "fmt"
 import "runtime"
 import "math"
 import "time"
-import "sync"
 import "container/heap"
+import "strings"
 
 func bToMb(b uint64) uint64 {
     return b / 1024 / 1024
@@ -28,6 +27,8 @@ type node struct {
 	t taquin
 	parent_node *node
 }
+
+type opti struct {}
 
 type Vector2D struct {
 	x, y uint8
@@ -105,52 +106,6 @@ func get_reverse_move(move int) int {
 	return -1
 }
 
-func remove_node_from_slice(list []node, n node) []node {
-	var i int
-
-	for i = 0; i < len(list); i++ {
-		if are_taquins_equal(&n.t, &list[i].t) {
-			return append(list[:i], list[i+1:]...)
-		}
-	}
-	return list
-}
-
-func are_taquins_equal(t1 *taquin, t2 *taquin) bool {
-	var i, j uint8
-
-	for i = 0; i < t1.size; i++ {
-		for j = 0; j < t1.size; j++ {
-			if (t1.taquin[i][j] != t2.taquin[i][j]) {
-				return false
-			}
-		}
-	}
-	return true
-}
-
-func is_node_in_slice(list []node, n node) bool {
-	var i int
-
-	for i = 0; i < len(list); i++ {
-		if are_taquins_equal(&n.t, &list[i].t) {
-			return true
-		}
-	}
-	return false
-}
-
-func is_node_in_slice_with_less_cost(list []node, n node) bool {
-	var i int
-
-	for i = 0; i < len(list); i++ {
-		if are_taquins_equal(&n.t, &list[i].t) && n.cost < list[i].cost {
-			return true
-		}
-	}
-	return false
-}
-
 func copy_taquin(t taquin) taquin {
 	var ret taquin
 	var i uint8
@@ -165,56 +120,29 @@ func copy_taquin(t taquin) taquin {
 	return ret
 }
 
-func solve(t *taquin, wg *sync.WaitGroup) {
-	var open_list []node
-	var close_list []node
-	var n, newn node
+func taquin_to_string(t *taquin) string {
 	var i int
+	var ret string = ""
 
-	start := time.Now()
-	n = node{t.voidpos, 0, calc_heuristic_manhattan_distance(t), -1, copy_taquin(*t), nil}
-	open_list = append(open_list, n)
-	for n.heuristic != 0 {
-		for i = 0; i < 4; i++ {
-			if (not_reverse_move(i, n.parent_move) && do_move(i, t)) {
-				newn = node{t.voidpos, n.cost+1, calc_heuristic_manhattan_distance(t), i, copy_taquin(*t), &n}
-				if (newn.heuristic == 0) {
-					fmt.Printf("%s: %d\n", "cost", n.cost)
-					PrintMemUsage()
-					fmt.Println(time.Since(start))
-					wg.Done()
-					return
-				}
-				if !(is_node_in_slice(close_list, newn)/* || is_node_in_slice_with_less_cost(open_list, newn)*/) {
-					open_list = append(open_list, newn)
-				}
-				do_move(get_reverse_move(i), t)
-			}
+	for i = 0; i < int(t.size); i++ {
+		ret += strings.Trim(strings.Replace(fmt.Sprint(t.taquin[i]), " ", ",", -1), "[]")
+		if (i < int(t.size) - 1) {
+			ret += ","
 		}
-		close_list = append(close_list, n)
-		open_list = open_list[1:]
-		sort.Slice(open_list, func(i, j int) bool {
-			return (open_list[i].heuristic+open_list[i].cost) < (open_list[j].heuristic+open_list[j].cost)
-		})
-		n = open_list[0]
-		*t = copy_taquin(n.t)
 	}
-	fmt.Printf("%s: %d\n", "cost", n.cost)
-	PrintMemUsage()
-	fmt.Println(time.Since(start))
-	wg.Done()
+	return ret
 }
 
-func solve2(t *taquin, wg *sync.WaitGroup) {
-	var close_list []node
+func solve(t *taquin) {
 	var n, newn node
 	var i int
 	var newItem *Item
 
+	close_list := make(map[string]opti)
 	open_list := make(PriorityQueue, 1)
 	start := time.Now()
 	n = node{t.voidpos, 0, calc_heuristic_manhattan_distance(t), -1, copy_taquin(*t), nil}
-	open_list[0] = &Item{n, n.heuristic+n.cost, 0}
+	open_list[0] = &Item{n, n.heuristic + n.cost, 0}
 	heap.Init(&open_list)
 	for n.heuristic != 0 {
 		n = heap.Pop(&open_list).(*Item).value
@@ -226,21 +154,51 @@ func solve2(t *taquin, wg *sync.WaitGroup) {
 					fmt.Printf("%s: %d\n", "cost", n.cost)
 					PrintMemUsage()
 					fmt.Println(time.Since(start))
-					wg.Done()
 					return
 				}
-				if !(is_node_in_slice(close_list, newn)/* || is_node_in_slice_with_less_cost(open_list, newn)*/) {
-					newItem = &Item{newn, newn.heuristic+n.cost, 0}
+				_, ok := close_list[taquin_to_string(&newn.t)]
+				if !(ok) {
+					newItem = &Item{newn, newn.heuristic + n.cost, 0}
 					heap.Push(&open_list, newItem)
-					open_list.update(newItem, newItem.value, newItem.priority)
 				}
 				do_move(get_reverse_move(i), t)
 			}
 		}
-		close_list = append(close_list, n)
+		close_list[taquin_to_string(&n.t)] = opti{}
 	}
-	fmt.Printf("%s: %d\n", "cost", n.cost)
-	PrintMemUsage()
-	fmt.Println(time.Since(start))
-	wg.Done()
+}
+
+func solve2(t *taquin) {
+	var n, newn node
+	var i int
+	var newItem *Item
+
+	close_list := make(map[string]opti)
+	open_list := make(PriorityQueue, 1)
+	start := time.Now()
+	n = node{t.voidpos, 0, calc_heuristic_manhattan_distance(t), -1, copy_taquin(*t), nil}
+	open_list[0] = &Item{n, n.heuristic + n.cost, 0}
+	heap.Init(&open_list)
+	for n.heuristic != 0 {
+		n = heap.Pop(&open_list).(*Item).value
+		*t = copy_taquin(n.t)
+		for i = 0; i < 4; i++ {
+			if (not_reverse_move(i, n.parent_move) && do_move(i, t)) {
+				newn = node{t.voidpos, n.cost+1, calc_heuristic_manhattan_distance(t), i, copy_taquin(*t), &n}
+				if (newn.heuristic == 0) {
+					fmt.Printf("%s: %d\n", "cost", n.cost)
+					PrintMemUsage()
+					fmt.Println(time.Since(start))
+					return
+				}
+				_, ok := close_list[taquin_to_string(&newn.t)]
+				if !(ok) {
+					newItem = &Item{newn, newn.heuristic + n.cost, 0}
+					heap.Push(&open_list, newItem)
+				}
+				do_move(get_reverse_move(i), t)
+			}
+		}
+		close_list[taquin_to_string(&n.t)] = opti{}
+	}
 }

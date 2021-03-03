@@ -4,7 +4,6 @@ import ("fmt"
 		"os"
 		"strconv"
 		"time"
-		"sync"
 )
 
 type taquin struct {
@@ -28,7 +27,7 @@ func generate_taquin(size uint8) taquin {
 	t := taquin{}
 	t.taquin = make([][]uint16, size)
 	t.size = size
-	t.voidpos = Vector2D{0, 0}
+	t.voidpos = Vector2D{size-1, size-1}
 	for i = 0; i < size; i++ {
 		t.taquin[i] = make([]uint16, size)
 		for j = 0; j < size; j++ {
@@ -48,11 +47,9 @@ func main() {
 	print_taquin(t)
 	fmt.Println("")
 	starttime := time.Now()
-	var wg sync.WaitGroup
-	wg.Add(2)
-	go solve(&t, &wg)
-	go solve2(&t2, &wg)
-	wg.Wait()
+	taquin_to_string(&t)
+	solve(&t)
+	solve2(&t2)
 	print_taquin(t)
 	fmt.Printf("total time: %s\n", time.Since(starttime))
 }
