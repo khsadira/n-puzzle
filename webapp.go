@@ -51,10 +51,11 @@ func loadHandler(w http.ResponseWriter, r *http.Request, puzzles *[]taquin) {
 	puzzle, err := convertFileToPuzzle(file)
 	if err != nil {
 		println("n-puzzle: load:", fileHeader.Filename, err.Error())
-		return
+	} else {
+		puzzle.ID = fileHeader.Filename
+		appendPuzzleToPuzzles(puzzles, puzzle)
 	}
-	puzzle.ID = fileHeader.Filename
-	appendPuzzleToPuzzles(puzzles, puzzle)
+	indexHandler(w, r)
 }
 
 func renderError(w http.ResponseWriter, message string, statusCode int) {
@@ -92,6 +93,7 @@ func gui(puzzles *[]taquin) {
 		w.Write([]byte("Server destroyed."))
 		cancel()
 	})
+
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal(err)
