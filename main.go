@@ -28,12 +28,14 @@ func main() {
 			loadCmd(&puzzles, args)
 		case "unload":
 			unloadCmd(&puzzles, args)
-		case "start":
+		case "gui": // to be deleted
+			gui(&puzzles)
+		case "start": // to be deleted
 			start()
 		case "solve":
 			println("solve", args)
 		case "play":
-			playCmd(&puzzles, args)
+			playCmd(puzzles, args)
 		case "credentials":
 			credentialsCmd()
 		case "quit":

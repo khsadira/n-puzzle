@@ -49,6 +49,7 @@ func isTaquinSolved(puzzle taquin) bool {
 	var taquinArray []uint16 = convertTaquinToArray(puzzle.taquin)
 	jmp := 0
 
+	fmt.Printf("%v\n", taquinArray)
 	if taquinArray[0] != 0 {
 		return false
 	}

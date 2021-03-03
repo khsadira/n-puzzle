@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"errors"
+	"io"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -33,7 +34,7 @@ func strToMapInt(line string, size uint8) ([]uint16, error) {
 	return ary, nil
 }
 
-func convertFileToPuzzle(file *os.File) (taquin, error) {
+func convertFileToPuzzle(file io.Reader) (taquin, error) {
 	var puzzle taquin
 	var err error
 
@@ -73,8 +74,30 @@ func convertFileToPuzzle(file *os.File) (taquin, error) {
 	return puzzle, nil
 }
 
-func loadCmd(puzzles *[]taquin, args []string) {
+func loadFilePuzzleToPuzzles(puzzles *[]taquin, file *os.File, arg string) {
 	var puzzle taquin
+
+	puzzle, err := convertFileToPuzzle(file)
+	if err != nil {
+		println("n-puzzle: load:", arg, err.Error())
+		return
+	}
+
+	puzzle.voidpos, err = getVoidPosTaquin(puzzle.taquin, puzzle.size)
+
+	if err != nil {
+		println("n-puzzle: load:", arg, err.Error())
+		return
+	}
+
+	puzzle.ID = filepath.Base(arg)
+
+	if isValidTaquin(puzzle) {
+		appendPuzzleToPuzzles(puzzles, puzzle)
+	}
+}
+
+func loadCmd(puzzles *[]taquin, args []string) {
 	var file *os.File
 	var err error
 
@@ -87,24 +110,6 @@ func loadCmd(puzzles *[]taquin, args []string) {
 		}
 
 		defer file.Close()
-
-		puzzle, err = convertFileToPuzzle(file)
-		if err != nil {
-			println("n-puzzle: load:", arg, err.Error())
-			continue
-		}
-
-		puzzle.voidpos, err = getVoidPosTaquin(puzzle.taquin, puzzle.size)
-
-		if err != nil {
-			println("n-puzzle: load:", arg, err.Error())
-			continue
-		}
-
-		puzzle.ID = filepath.Base(arg)
-
-		if isValidTaquin(puzzle) {
-			appendPuzzleToPuzzles(puzzles, puzzle)
-		}
+		loadFilePuzzleToPuzzles(puzzles, file, arg)
 	}
 }
