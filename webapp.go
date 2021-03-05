@@ -71,7 +71,7 @@ func playHandler(w http.ResponseWriter, r *http.Request, puzzles []taquin) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	var template = template.Must(template.ParseFiles("template/play2.html"))
+	var template = template.Must(template.ParseFiles("template/play.html"))
 	ID := r.FormValue("ID")
 	for i := 0; i < len(puzzles); i++ {
 		if puzzles[i].ID == ID {
