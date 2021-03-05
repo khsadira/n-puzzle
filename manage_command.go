@@ -21,7 +21,7 @@ func showCmd(puzzles []taquin, args []string) int {
 	if args == nil {
 		for _, puzzle := range puzzles {
 
-			fmt.Printf("%s: %d\n", puzzle.ID, puzzle.size)
+			fmt.Printf("%s: %d\n", puzzle.ID, puzzle.Size)
 		}
 		return 0
 	}
@@ -29,7 +29,7 @@ func showCmd(puzzles []taquin, args []string) int {
 	for _, arg := range args {
 		for _, puzzle := range puzzles {
 			if puzzle.ID == arg {
-				println(puzzle.size)
+				println(puzzle.Size)
 				showPuzzle(puzzle)
 			}
 		}

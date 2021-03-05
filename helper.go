@@ -14,8 +14,8 @@ func getVoidPosTaquin(taquin [][]uint16, size uint8) (Vector2D, error) {
 	for i = 0; i < size; i++ {
 		for j = 0; j < size; j++ {
 			if taquin[i][j] == 0 {
-				voidpos.x = i
-				voidpos.y = j
+				voidpos.X = i
+				voidpos.Y = j
 				return voidpos, nil
 			}
 		}
@@ -36,17 +36,17 @@ func appendPuzzleToPuzzles(puzzles *[]taquin, puzzleToAdd taquin) {
 }
 
 func showPuzzle(puzzle taquin) {
-	for i := uint8(0); i < puzzle.size; i++ {
+	for i := uint8(0); i < puzzle.Size; i++ {
 		var IDs []string
-		for j := uint8(0); j < puzzle.size; j++ {
-			IDs = append(IDs, strconv.Itoa(int(puzzle.taquin[i][j])))
+		for j := uint8(0); j < puzzle.Size; j++ {
+			IDs = append(IDs, strconv.Itoa(int(puzzle.Taquin[i][j])))
 		}
 		fmt.Println(strings.Join(IDs, " "))
 	}
 }
 
 func isTaquinSolved(puzzle taquin) bool {
-	var taquinArray []uint16 = convertTaquinToArray(puzzle.taquin)
+	var taquinArray []uint16 = convertTaquinToArray(puzzle.Taquin)
 	jmp := 0
 
 	fmt.Printf("%v\n", taquinArray)

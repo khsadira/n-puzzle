@@ -13,9 +13,12 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	template.Execute(w, nil)
 }
 
-func showHandler(w http.ResponseWriter, r *http.Request) {
+func showHandler(w http.ResponseWriter, r *http.Request, puzzles []taquin) {
 	var template = template.Must(template.ParseFiles("template/show.html"))
-	template.Execute(w, nil)
+	err := template.Execute(w, puzzles)
+	if err != nil {
+		fmt.Printf("%v\n", err)
+	}
 }
 
 func loadHandler(w http.ResponseWriter, r *http.Request, puzzles *[]taquin) {
@@ -81,12 +84,17 @@ func gui(puzzles *[]taquin) {
 
 	mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
 	mux.HandleFunc("/", indexHandler)
-	mux.HandleFunc("/show", showHandler)
+
 	mux.HandleFunc("/play", playHandler)
+	mux.HandleFunc("/solve", solveHandler)
+
+	mux.HandleFunc("/show", func(w http.ResponseWriter, r *http.Request) {
+		showHandler(w, r, *puzzles)
+	})
+
 	mux.HandleFunc("/load", func(w http.ResponseWriter, r *http.Request) {
 		loadHandler(w, r, puzzles)
 	})
-	mux.HandleFunc("/solve", solveHandler)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	mux.HandleFunc("/quit", func(w http.ResponseWriter, r *http.Request) {

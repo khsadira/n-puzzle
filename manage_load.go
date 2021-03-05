@@ -53,12 +53,12 @@ func convertFileToPuzzle(file io.Reader) (taquin, error) {
 				return puzzle, errors.New("puzzle not well formatted.")
 			}
 
-			puzzle.size = uint8(size64)
-			puzzle.taquin = make([][]uint16, puzzle.size)
-		} else if i > puzzle.size {
+			puzzle.Size = uint8(size64)
+			puzzle.Taquin = make([][]uint16, puzzle.Size)
+		} else if i > puzzle.Size {
 			return puzzle, errors.New("puzzle not well formatted.")
 		} else {
-			puzzle.taquin[i-1], err = strToMapInt(line, puzzle.size)
+			puzzle.Taquin[i-1], err = strToMapInt(line, puzzle.Size)
 
 			if err != nil {
 				return puzzle, errors.New("puzzle not well formatted.")
@@ -67,7 +67,7 @@ func convertFileToPuzzle(file io.Reader) (taquin, error) {
 		i++
 	}
 
-	if i != puzzle.size+1 {
+	if i != puzzle.Size+1 {
 		return puzzle, errors.New("puzzle not well formatted.")
 	}
 
@@ -83,7 +83,7 @@ func loadFilePuzzleToPuzzles(puzzles *[]taquin, file *os.File, arg string) {
 		return
 	}
 
-	puzzle.voidpos, err = getVoidPosTaquin(puzzle.taquin, puzzle.size)
+	puzzle.Voidpos, err = getVoidPosTaquin(puzzle.Taquin, puzzle.Size)
 
 	if err != nil {
 		println("n-puzzle: load:", arg, err.Error())

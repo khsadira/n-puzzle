@@ -24,19 +24,19 @@ func PrintMemUsage() {
 
 func get_target_pos(val uint16, t *taquin) Vector2D {
 	if val == 0 {
-		return Vector2D{t.size - 1, t.size - 1}
+		return Vector2D{t.Size - 1, t.Size - 1}
 	}
 	var x, y uint8
-	x = uint8(val % uint16(t.size))
+	x = uint8(val % uint16(t.Size))
 	if x == 0 {
-		x = t.size
+		x = t.Size
 	}
-	y = uint8(math.Ceil(float64(val) / float64(t.size)))
+	y = uint8(math.Ceil(float64(val) / float64(t.Size)))
 	return Vector2D{x - 1, y - 1}
 }
 
 func calc_manhattan_distance(p1 Vector2D, p2 Vector2D) uint16 {
-	return uint16(math.Abs(float64(p1.x)-float64(p2.x)) + math.Abs(float64(p1.y)-float64(p2.y)))
+	return uint16(math.Abs(float64(p1.X)-float64(p2.X)) + math.Abs(float64(p1.Y)-float64(p2.Y)))
 }
 
 func calc_heuristic_manhattan_distance(t *taquin) uint16 {
@@ -44,10 +44,10 @@ func calc_heuristic_manhattan_distance(t *taquin) uint16 {
 	var i, j uint8
 	var val uint16 = 1
 
-	for i = 0; i < t.size; i++ {
-		for j = 0; j < t.size; j++ {
-			if t.taquin[i][j] != val && t.taquin[i][j] != 0 {
-				ret += calc_manhattan_distance(Vector2D{j, i}, get_target_pos(t.taquin[i][j], t))
+	for i = 0; i < t.Size; i++ {
+		for j = 0; j < t.Size; j++ {
+			if t.Taquin[i][j] != val && t.Taquin[i][j] != 0 {
+				ret += calc_manhattan_distance(Vector2D{j, i}, get_target_pos(t.Taquin[i][j], t))
 			}
 			val++
 		}
@@ -60,9 +60,9 @@ func calc_heuristic_nb_misplaced(t *taquin) uint16 {
 	var i, j uint8
 	var val uint16 = 1
 
-	for i = 0; i < t.size; i++ {
-		for j = 0; j < t.size; j++ {
-			if t.taquin[i][j] != val && t.taquin[i][j] != 0 {
+	for i = 0; i < t.Size; i++ {
+		for j = 0; j < t.Size; j++ {
+			if t.Taquin[i][j] != val && t.Taquin[i][j] != 0 {
 				ret++
 			}
 			val++
@@ -108,9 +108,9 @@ func remove_node_from_slice(list []node, n node) []node {
 func are_taquins_equal(t1 *taquin, t2 *taquin) bool {
 	var i, j uint8
 
-	for i = 0; i < t1.size; i++ {
-		for j = 0; j < t1.size; j++ {
-			if t1.taquin[i][j] != t2.taquin[i][j] {
+	for i = 0; i < t1.Size; i++ {
+		for j = 0; j < t1.Size; j++ {
+			if t1.Taquin[i][j] != t2.Taquin[i][j] {
 				return false
 			}
 		}
@@ -144,12 +144,12 @@ func copy_taquin(t taquin) taquin {
 	var ret taquin
 	var i uint8
 
-	ret.voidpos = Vector2D{t.voidpos.x, t.voidpos.y}
-	ret.size = t.size
-	ret.taquin = make([][]uint16, len(t.taquin))
-	for i = 0; i < ret.size; i++ {
-		ret.taquin[i] = make([]uint16, len(t.taquin[i]))
-		copy(ret.taquin[i], t.taquin[i])
+	ret.Voidpos = Vector2D{t.Voidpos.X, t.Voidpos.Y}
+	ret.Size = t.Size
+	ret.Taquin = make([][]uint16, len(t.Taquin))
+	for i = 0; i < ret.Size; i++ {
+		ret.Taquin[i] = make([]uint16, len(t.Taquin[i]))
+		copy(ret.Taquin[i], t.Taquin[i])
 	}
 	return ret
 }
@@ -161,12 +161,12 @@ func solve(t *taquin, wg *sync.WaitGroup) {
 	var i int
 
 	start := time.Now()
-	n = node{t.voidpos, 0, calc_heuristic_manhattan_distance(t), -1, copy_taquin(*t), nil}
+	n = node{t.Voidpos, 0, calc_heuristic_manhattan_distance(t), -1, copy_taquin(*t), nil}
 	open_list = append(open_list, n)
 	for n.heuristic != 0 {
 		for i = 0; i < 4; i++ {
 			if not_reverse_move(i, n.parent_move) && do_move(i, t) {
-				newn = node{t.voidpos, n.cost + 1, calc_heuristic_manhattan_distance(t), i, copy_taquin(*t), &n}
+				newn = node{t.Voidpos, n.cost + 1, calc_heuristic_manhattan_distance(t), i, copy_taquin(*t), &n}
 				if newn.heuristic == 0 {
 					fmt.Printf("%s: %d\n", "cost", n.cost)
 					PrintMemUsage()
@@ -201,12 +201,12 @@ func solve2(t *taquin, wg *sync.WaitGroup) {
 	var i int
 
 	start := time.Now()
-	n = node{t.voidpos, 0, calc_heuristic_manhattan_distance(t), -1, copy_taquin(*t), nil}
+	n = node{t.Voidpos, 0, calc_heuristic_manhattan_distance(t), -1, copy_taquin(*t), nil}
 	open_list = append(open_list, n)
 	for n.heuristic != 0 {
 		for i = 0; i < 4; i++ {
 			if not_reverse_move(i, n.parent_move) && do_move(i, t) {
-				newn = node{t.voidpos, n.cost + 1, calc_heuristic_manhattan_distance(t), i, copy_taquin(*t), &n}
+				newn = node{t.Voidpos, n.cost + 1, calc_heuristic_manhattan_distance(t), i, copy_taquin(*t), &n}
 				if newn.heuristic == 0 {
 					fmt.Printf("%s: %d\n", "cost", n.cost)
 					PrintMemUsage()

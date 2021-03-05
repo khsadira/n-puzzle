@@ -1,85 +1,143 @@
 html {
-    box-sizing: border-box;
-  }
+  box-sizing: border-box;
+}
 
-  *, *::before, *::after {
-    box-sizing: inherit;
+*, *::before, *::after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --light-green: #00ff00;
+  --dark-green: #010703;
+  --dark-black: #000000;
+}
+
+body {
+  background-color:rgb(44, 43, 43);
+  margin-top: 50px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: #333;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a.body_button {
+  text-align: center;
+  margin:auto;display:block;
+  border: 2px solid #004400;
+  color: var(--dark-green);
+  border-radius: 4px;
+  padding: 6px 24px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+a.body_button:hover {
+  text-decoration: none;
+  background-color: var(--dark-black);
+  color: var(--light-green);
+}
+
+
+a.header_button {
+  border: 2px solid #004400;
+  color: var(--light-green);
+  border-radius: 120px;
+  padding: 6px 24px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+a.header_button:hover {
+  text-decoration: none;
+  background-color: var(--light-green);
+  color: var(--dark-green);
+}
+
+a.github-button {
+  position:absolute;
+  right: 0;
+}
+
+header {
+  width: 100%;
+  height: 50px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--dark-green);
+  padding: 5px 10px;
+  align-items: center;
+}
+
+.center-div {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.center-table {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+table {
+    border-collapse: collapse; /* Les bordures du tableau seront collées (plus joli) */
+}
+
+td {
+  border: 1px solid black;
+}
+
+
+.view-screen {
+  margin: auto;
+  text-align: center;
+  border: 1px solid #444444;
+}
+
+.puzzle {
+  border: 2px solid #444444;
+  padding: 5px;
+  margin: auto;
+}
+
+.puzzle ul {
     margin: 0;
     padding: 0;
-  }
 
-  :root {
-    --light-green: #00ff00;
-    --dark-green: #010703;
-    --dark-black: #000000;
-  }
-  
-  body {
-    background-color:rgb(44, 43, 43);
-    margin-top: 50px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
-  }
-  
-  a {
-    text-decoration: none;
-    color: #333;
-  }
-  
-  a:hover {
-    text-decoration: underline;
-  }
-  
-  a.body_button {
+    list-style: none;
+    font-size: 0;
+}
+
+.puzzle li {
+    display: inline-block;
+    margin: 5px;
+    width: 76px; 
+    height: 76px; 
+    border: 2px solid #444444;
+
+    line-height: 76px;
+    font-size: 40px;
     text-align: center;
-    margin:auto;display:block;
-    border: 2px solid #004400;
-    color: var(--dark-green);
-    border-radius: 4px;
-    padding: 6px 24px;
-    font-size: 14px;
-    font-weight: 400;
-  }
-  
-  a.body_button:hover {
-    text-decoration: none;
-    background-color: var(--dark-black);
-    color: var(--light-green);
-  }
+}
 
+.puzzle li.incorrect {
+    background-color: #333333;
+    color: #ff0000;
+}
 
-  a.header_button {
-
-    border: 2px solid #004400;
-    color: var(--light-green);
-    border-radius: 120px;
-    padding: 6px 24px;
-    font-size: 14px;
-    font-weight: 400;
-  }
-  
-  a.header_button:hover {
-    text-decoration: none;
-    background-color: var(--light-green);
-    color: var(--dark-green);
-  }
-  
-  a.github-button {
-    position:absolute;
-    right: 0;
-  }
-
-  header {
-    width: 100%;
-    height: 50px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: space-between;
-    background-color: var(--dark-green);
-    padding: 5px 10px;
-    align-items: center;
-  }
-
-  }
+.puzzle li.correct {
+    background-color: #333333;
+    color: #00ff00;
+}

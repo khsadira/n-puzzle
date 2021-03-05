@@ -2,13 +2,13 @@ package main
 
 type taquin struct {
 	ID      string
-	taquin  [][]uint16
-	size    uint8
-	voidpos Vector2D
+	Taquin  [][]uint16
+	Size    uint8
+	Voidpos Vector2D
 }
 
 type Vector2D struct {
-	x, y uint8
+	X, Y uint8
 }
 
 type node struct {

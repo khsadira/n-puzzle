@@ -11,8 +11,8 @@ import (
 func print_taquin(t taquin) {
 	var i uint8
 
-	for i = 0; i < t.size; i++ {
-		fmt.Println(t.taquin[i])
+	for i = 0; i < t.Size; i++ {
+		fmt.Println(t.Taquin[i])
 	}
 }
 
@@ -21,17 +21,17 @@ func generate_taquin(size uint8) taquin {
 	var tmp uint16 = 1
 
 	t := taquin{}
-	t.taquin = make([][]uint16, size)
-	t.size = size
-	t.voidpos = Vector2D{0, 0}
+	t.Taquin = make([][]uint16, size)
+	t.Size = size
+	t.Voidpos = Vector2D{0, 0}
 	for i = 0; i < size; i++ {
-		t.taquin[i] = make([]uint16, size)
+		t.Taquin[i] = make([]uint16, size)
 		for j = 0; j < size; j++ {
-			t.taquin[i][j] = tmp
+			t.Taquin[i][j] = tmp
 			tmp++
 		}
 	}
-	t.taquin[size-1][size-1] = 0
+	t.Taquin[size-1][size-1] = 0
 	return t
 }
 
