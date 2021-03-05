@@ -15,6 +15,7 @@
 
   {{range .}}
   <br>
+  <form>
     <div class="puzzle-name">{{.ID}}</div>
     <div class="puzzle {{.Size}}-puzzle">
       <ul class="n-puzzle">
@@ -25,11 +26,9 @@
         {{end}}
       </ul>
     </div>
-    <div class="div-form">
-    <form class="play-form"></form>
-    <from class="solve-form"></from>
-    <form class="delete-form"></form>
-    </div>
+    <button type="submit" name="action" value="update">Update</button>
+    <button type="submit" name="action" value="delete">Delete</button>
+  </form>
     <br>
   {{end}}
   </div>
