@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <title>Home</title>
+  <title>show</title>
   <link rel="stylesheet" href="/assets/style.css" />
 </head>
 
@@ -15,24 +16,28 @@
 
   {{range .}}
   <br>
-  <form>
+  <form method="post">
     <div class="puzzle-name">{{.ID}}</div>
+    <input type="hidden" name="ID" value="{{.ID}}"/>
+    <input type="hidden" name="size" value="{{.Size}}"/>
+    <input type="hidden" name="taquin" value="{{.Taquin}}"/>
     <div class="puzzle {{.Size}}-puzzle">
       <ul class="n-puzzle">
         {{range .Taquin}}
           {{range .}}
-            <li class="incorrect" data-tile="{{.}}">{{.}}</li>
+            <li data-tile="{{.}}">{{.}}</li>
           {{end}}
         {{end}}
       </ul>
     </div>
-    <button type="submit" name="action" value="update">Update</button>
-    <button type="submit" name="action" value="delete">Delete</button>
+    <button type="submit" formaction="/play" value="play">Play</button>
+    <button type="submit" formaction="/solve" value="solve">Solve</button>
+    <button type="submit" formaction="/delete" value="delete">Delete</button>
   </form>
     <br>
   {{end}}
   </div>
-</body>
+</body> 
 
 <script>
 
@@ -49,18 +54,13 @@
 
   var elements = document.getElementsByClassName("n-puzzle");
 
-  console.log(elements)
   for (var i = 0; i < elements.length; i++) {
     var childs = elements[i].getElementsByTagName('li')
     for (var j = 0; j < childs.length; j++) {
-      console.log(childs[j].innerText)
       var correct = j + 1 == childs[j].innerText;
-
       var cssClass = childs[j].innerText == 0 ? "empty" : (correct ? "correct" : "incorrect");
-
       childs[j].className=cssClass
-      console.log(childs[j])
     }
   }
 </script>
-
+</html>

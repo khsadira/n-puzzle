@@ -63,3 +63,12 @@ func isTaquinSolved(puzzle taquin) bool {
 	}
 	return true
 }
+
+func removePuzzles(puzzles *[]taquin, ID string) {
+	for i := 0; i < len(*puzzles); i++ {
+		if (*puzzles)[i].ID == ID {
+			showPuzzle((*puzzles)[i])
+			*puzzles = append((*puzzles)[:i], (*puzzles)[i+1:]...)
+		}
+	}
+}

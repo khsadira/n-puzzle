@@ -15,18 +15,10 @@
   <div class="view-screen">
   <br>
     <div class="puzzle-name">{{.ID}}</div>
-    <div class="puzzle {{.Size}}-puzzle">
-      <ul class="n-puzzle">
-        {{range .Taquin}}
-          {{range .}}
-            <li onclick="moveCase({{.}})" data-tile="{{.}}">{{.}}</li>
-          {{end}}
-        {{end}}
-      </ul>
-    </div>
-    <br>
+    <div class="puzzle"></div>
+  <br>
   </div>
-</body> 
+</body>
 
 <script>
   function getArray() {
@@ -39,26 +31,37 @@
       return array
   }
 
-  var firstArray = getArray()
-  console.log(firstArray)
 
   function printPuzzle(array) {
+    var elements = document.getElementsByClassName("puzzle")
+    var ul = document.createElement('ul')
+
+    ul.className = "n-puzzle"
     for (var i = 0; i < array.length; i++) {
-      
+      var li = document.createElement('li');
+      li["data-tile"]=array[i]
+      li.innerText = array[i]
+      li.onclick = function() {
+        moveCase(this["data-tile"])
+      }
+      ul.appendChild(li)
+    }
+    elements[0].appendChild(ul)
+  }
+
+  function setPuzzleSize() {
+    var size = {{.Size}} * 90 + 2
+    var elements = document.getElementsByClassName("puzzle");
+
+
+    for (var i = 0; i < elements.length; i++) {
+          elements[i].style.width=(size+"px");
+          elements[i].style.height=(size+"px");
     }
   }
 
-  var size = {{.Size}} * 90 + 2
-  var elements = document.getElementsByClassName("{{.Size}}-puzzle");
-
-
-  for (var i = 0; i < elements.length; i++) {
-        elements[i].style.width=(size+"px");
-        elements[i].style.height=(size+"px");
-  }
-
   function moveCase(id) {
-    
+    console.log("HIHI id", id)
     setClass()
   }
 
@@ -74,9 +77,10 @@
     }
   }
 
+  var firstArray = getArray()
+  printPuzzle(firstArray)
+  setPuzzleSize()
   setClass()
-
-
 
 </script>
 </html>
