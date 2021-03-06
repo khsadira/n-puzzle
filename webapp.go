@@ -75,7 +75,6 @@ func playHandler(w http.ResponseWriter, r *http.Request, puzzles []taquin) {
 	ID := r.FormValue("ID")
 	for i := 0; i < len(puzzles); i++ {
 		if puzzles[i].ID == ID {
-			showPuzzle(puzzles[i])
 			template.Execute(w, puzzles[i])
 		}
 	}

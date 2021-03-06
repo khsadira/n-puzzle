@@ -100,35 +100,33 @@ func main() {
 	// // 	appendPuzzleToPuzzles(&puzzles, puzzle)
 	// // }
 
-	gui(&puzzles)
+	for {
+		cmd, args := getUserEntry("> ")
 
-	// for {
-	// 	cmd, args := getUserEntry("> ")
-
-	// 	switch cmd {
-	// 	case "help":
-	// 		helpCmd(args)
-	// 	case "show":
-	// 		showCmd(puzzles, args)
-	// 	case "load":
-	// 		loadCmd(&puzzles, args)
-	// 	case "unload":
-	// 		unloadCmd(&puzzles, args)
-	// 	case "gui": // to be deleted
-	// 		gui(&puzzles)
-	// 	case "start": // to be deleted
-	// 		start()
-	// 	case "solve":
-	// 		println("solve", args)
-	// 	case "play":
-	// 		playCmd(puzzles, args)
-	// 	case "credentials":
-	// 		credentialsCmd()
-	// 	case "quit":
-	// 		return
-	// 	default:
-	// 		println("n-puzzle: " + cmd + ": command not found\nType `help name' to find out more about the function `name`.")
-	// 	}
-	// 	println()
-	// }
+		switch cmd {
+		case "help":
+			helpCmd(args)
+		case "show":
+			showCmd(puzzles, args)
+		case "load":
+			loadCmd(&puzzles, args)
+		case "unload":
+			unloadCmd(&puzzles, args)
+		case "gui": // to be deleted
+			gui(&puzzles)
+		case "start": // to be deleted
+			start()
+		case "solve":
+			println("solve", args)
+		case "play":
+			playCmd(puzzles, args)
+		case "credentials":
+			credentialsCmd()
+		case "quit":
+			return
+		default:
+			println("n-puzzle: " + cmd + ": command not found\nType `help name' to find out more about the function `name`.")
+		}
+		println()
+	}
 }
