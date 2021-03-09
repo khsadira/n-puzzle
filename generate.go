@@ -3,7 +3,6 @@ package main
 import ("fmt"
 		"os"
 		"strconv"
-		"time"
 )
 
 type taquin struct {
@@ -43,19 +42,5 @@ func main() {
 	i, _ := strconv.ParseInt(os.Args[1], 10, 8);
 	t := generate_taquin(uint8(i))
 	mix_taquin(&t)
-	t2 := copy_taquin(t)
-	t3 := copy_taquin(t)
-	print_taquin(t)
-	fmt.Println("")
-	starttime := time.Now()
-	taquin_to_string(&t)
-	solve_astar(&t)
-	solve_uniform_cost(&t2)
-	solve_greedysearch(&t3)
-	print_taquin(t)
-	fmt.Println("")
-	print_taquin(t2)
-	fmt.Println("")
-	print_taquin(t3)
-	fmt.Printf("total time: %s\n", time.Since(starttime))
+	algorithm[algo](&t)
 }
