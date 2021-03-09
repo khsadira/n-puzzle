@@ -133,7 +133,7 @@ func taquin_to_string(t *taquin) string {
 	return ret
 }
 
-func solve(t *taquin) {
+func solve_astar(t *taquin) {
 	var n, newn node
 	var i int
 	var newItem *Item
@@ -168,7 +168,62 @@ func solve(t *taquin) {
 	}
 }
 
-func solve2(t *taquin) {
+func is_taquin_completed(t *taquin) bool {
+	var i, j uint8
+	var val uint16 = 1
+
+	for i = 0; i < t.size; i++ {
+		for j = 0; j < t.size; j++ {
+			if (i == t.size-1 && j == t.size-1) {
+				break
+			}
+			if (t.taquin[i][j] != val) {
+				return false
+			}
+			val++
+		}
+	}
+	return true
+}
+
+func solve_uniform_cost(t *taquin) {
+	var n, newn node
+	var i int
+	var newItem *Item
+	var completed bool = false
+
+	close_list := make(map[string]opti)
+	open_list := make(PriorityQueue, 1)
+	start := time.Now()
+	n = node{t.voidpos, 0, 0, -1, copy_taquin(*t), nil}
+	open_list[0] = &Item{n, n.cost, 0}
+	heap.Init(&open_list)
+	for !completed {
+		n = heap.Pop(&open_list).(*Item).value
+		*t = copy_taquin(n.t)
+		for i = 0; i < 4; i++ {
+			if (not_reverse_move(i, n.parent_move) && do_move(i, t)) {
+				newn = node{t.voidpos, n.cost+1, 0, i, copy_taquin(*t), &n}
+				completed = is_taquin_completed(t)
+				if (completed) {
+					fmt.Printf("%s: %d\n", "cost", n.cost)
+					PrintMemUsage()
+					fmt.Println(time.Since(start))
+					return
+				}
+				_, ok := close_list[taquin_to_string(&newn.t)]
+				if !(ok) {
+					newItem = &Item{newn, n.cost, 0}
+					heap.Push(&open_list, newItem)
+				}
+				do_move(get_reverse_move(i), t)
+			}
+		}
+		close_list[taquin_to_string(&n.t)] = opti{}
+	}
+}
+
+func solve_greedysearch(t *taquin) {
 	var n, newn node
 	var i int
 	var newItem *Item
@@ -177,23 +232,23 @@ func solve2(t *taquin) {
 	open_list := make(PriorityQueue, 1)
 	start := time.Now()
 	n = node{t.voidpos, 0, calc_heuristic_manhattan_distance(t), -1, copy_taquin(*t), nil}
-	open_list[0] = &Item{n, n.heuristic + n.cost, 0}
+	open_list[0] = &Item{n, n.heuristic, 0}
 	heap.Init(&open_list)
 	for n.heuristic != 0 {
 		n = heap.Pop(&open_list).(*Item).value
 		*t = copy_taquin(n.t)
 		for i = 0; i < 4; i++ {
 			if (not_reverse_move(i, n.parent_move) && do_move(i, t)) {
-				newn = node{t.voidpos, n.cost+1, calc_heuristic_manhattan_distance(t), i, copy_taquin(*t), &n}
+				newn = node{t.voidpos, 0, calc_heuristic_manhattan_distance(t), i, copy_taquin(*t), &n}
 				if (newn.heuristic == 0) {
-					fmt.Printf("%s: %d\n", "cost", n.cost)
+					fmt.Printf("%s: %d\n", "cost", 0)
 					PrintMemUsage()
 					fmt.Println(time.Since(start))
 					return
 				}
 				_, ok := close_list[taquin_to_string(&newn.t)]
 				if !(ok) {
-					newItem = &Item{newn, newn.heuristic + n.cost, 0}
+					newItem = &Item{newn, newn.heuristic, 0}
 					heap.Push(&open_list, newItem)
 				}
 				do_move(get_reverse_move(i), t)
