@@ -28,7 +28,7 @@
 
   function getArray() {
     var array = []
-      {{range .Taquin}}
+      {{range .TaquinStruct.Taquin}}
         {{range .}}
         array.push({{.}})
         {{end}}
@@ -55,7 +55,7 @@
   }
 
   function setPuzzleSize() {
-    var size = {{.Size}} * 90 + 2
+    var size = {{.TaquinStruct.Size}} * 90 + 10
     var elements = document.getElementsByClassName("puzzle");
 
     for (var i = 0; i < elements.length; i++) {
@@ -90,6 +90,19 @@
     }
   }
 
+  function isValid(array) {
+    var isValid = 0
+    for (var i = 0; i < array.length; i++) {
+          if (i + 1 != array[i] && array[i] != 0) {
+            isValid = 1
+        }
+    }
+    if (isValid == 1) {
+      return false
+    }
+    return true
+  }
+
   function moveCase(parent, id, index) {
     var elements = parent.getElementsByTagName('li')
     var size = Math.sqrt(parent.getElementsByTagName('li').length)
@@ -118,13 +131,8 @@
         array[target] = array[index]
         array[index] = tmp
 
-        var isValid = 0;
-        for (var i = 0; i < array.length; i++) {
-          if (i + 1 != array[i] && array[i] != 0) {
-            isValid = 1
-          }
-        }
-        if (isValid == 0) {
+
+        if (isValid(array)) {
           document.getElementsByClassName("view-screen")[0].style.display = "none"
           document.getElementsByClassName("gg-screen-div")[0].style.display = "block"
           document.getElementsByClassName("gg-screen-p")[0].innerText = "WELL PLAYED ! You solved the puzzle in " + count + " moves"
@@ -139,7 +147,14 @@
 
   window.onload = function() {
     var firstArray = getArray()
-    printTaquin(firstArray)
+    
+    if (isValid(firstArray)) {
+          document.getElementsByClassName("view-screen")[0].style.display = "none"
+          document.getElementsByClassName("gg-screen-div")[0].style.display = "block"
+          document.getElementsByClassName("gg-screen-p")[0].innerText = "The puzzle is already solved."
+        } else {
+          printTaquin(firstArray)
+        }
   }
 
 </script>

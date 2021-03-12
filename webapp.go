@@ -54,6 +54,13 @@ func loadHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		println("n-puzzle: load:", fileHeader.Filename, err.Error())
 	} else {
+		puzzle.Voidpos, err = getVoidPosTaquin(puzzle.Taquin, puzzle.Size)
+
+		if err != nil {
+			println("n-puzzle: load:", fileHeader.Filename, err.Error())
+			return
+		}
+
 		if isValidTaquin(fileHeader.Filename, puzzle) {
 			var data = metaTaquin{
 				ID:           fileHeader.Filename,
@@ -79,16 +86,30 @@ func playHandler(w http.ResponseWriter, r *http.Request) {
 	ID := r.FormValue("ID")
 	for _, data := range globalData {
 		if data.ID == ID {
-			template.Execute(w, data.TaquinStruct)
+			template.Execute(w, data)
 		}
 	}
 }
 
 func solveHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		var template = template.Must(template.ParseFiles("template/solve.html"))
-		template.Execute(w, nil)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
+	}
+	ID := r.FormValue("ID")
+
+	for _, data := range globalData {
+		if data.ID == ID {
+			cpy := createPuzzleCopy(data.TaquinStruct)
+			algorithm[algo](&cpy)
+
+			data := metaTaquin{
+				ID:           ID,
+				TaquinStruct: cpy}
+
+			var template = template.Must(template.ParseFiles("template/solve.html"))
+			template.Execute(w, data)
+		}
 	}
 }
 
