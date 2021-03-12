@@ -4,33 +4,25 @@ import (
 	"fmt"
 )
 
-func unloadCmd(puzzles *[]taquin, args []string) {
+func unloadCmd(args []string) {
 	for _, arg := range args {
-		var tmpPuzzles []taquin = *puzzles
-
-		for i, puzzle := range *puzzles {
-			if puzzle.ID == arg {
-				tmpPuzzles = append(tmpPuzzles[:i], tmpPuzzles[i+1:]...)
-			}
-		}
-		*puzzles = tmpPuzzles
+		removeData(arg)
 	}
 }
 
-func showCmd(puzzles []taquin, args []string) int {
+func showCmd(args []string) int {
 	if args == nil {
-		for _, puzzle := range puzzles {
-
-			fmt.Printf("%s: %d\n", puzzle.ID, puzzle.Size)
+		for _, data := range globalData {
+			fmt.Printf("%s: %d\n", data.ID, data.TaquinStruct.Size)
 		}
 		return 0
 	}
 
 	for _, arg := range args {
-		for _, puzzle := range puzzles {
-			if puzzle.ID == arg {
-				println(puzzle.Size)
-				showPuzzle(puzzle)
+		for _, data := range globalData {
+			if data.ID == arg {
+				println(data.TaquinStruct.Size)
+				showPuzzle(data.TaquinStruct)
 			}
 		}
 	}
@@ -54,6 +46,10 @@ func helpCmd(args []string) int {
 			println("load: usage:")
 		case "solve":
 			println("solve: usage:")
+		case "set":
+			println("set: usage:")
+		case "gui":
+			println("gui: usage:")
 		case "credentials":
 			println("credentials: usage:")
 		case "quit":

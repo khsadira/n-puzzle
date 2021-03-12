@@ -1,13 +1,5 @@
 package main
 
-type Item struct {
-	value    node
-	priority uint16
-	index int
-}
-
-type PriorityQueue []*Item
-
 func (pq PriorityQueue) Len() int {
 	return len(pq)
 }

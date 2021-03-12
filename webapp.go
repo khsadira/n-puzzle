@@ -15,12 +15,12 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	template.Execute(w, nil)
 }
 
-func showHandler(w http.ResponseWriter, r *http.Request, puzzles []taquin) {
+func showHandler(w http.ResponseWriter, r *http.Request) {
 	var template = template.Must(template.ParseFiles("template/show.html"))
-	template.Execute(w, puzzles)
+	template.Execute(w, globalData)
 }
 
-func loadHandler(w http.ResponseWriter, r *http.Request, puzzles *[]taquin) {
+func loadHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		template, _ := template.ParseFiles("template/load.html")
 		template.Execute(w, nil)
@@ -54,8 +54,12 @@ func loadHandler(w http.ResponseWriter, r *http.Request, puzzles *[]taquin) {
 	if err != nil {
 		println("n-puzzle: load:", fileHeader.Filename, err.Error())
 	} else {
-		puzzle.ID = fileHeader.Filename
-		appendPuzzleToPuzzles(puzzles, puzzle)
+		if isValidTaquin(fileHeader.Filename, puzzle) {
+			var data = metaTaquin{
+				ID:           fileHeader.Filename,
+				TaquinStruct: puzzle}
+			appendDataToGlobalData(data)
+		}
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -66,21 +70,21 @@ func renderError(w http.ResponseWriter, message string, statusCode int) {
 	w.Write([]byte(message))
 }
 
-func playHandler(w http.ResponseWriter, r *http.Request, puzzles []taquin) {
+func playHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 	var template = template.Must(template.ParseFiles("template/play.html"))
 	ID := r.FormValue("ID")
-	for i := 0; i < len(puzzles); i++ {
-		if puzzles[i].ID == ID {
-			template.Execute(w, puzzles[i])
+	for _, data := range globalData {
+		if data.ID == ID {
+			template.Execute(w, data.TaquinStruct)
 		}
 	}
 }
 
-func solveHandler(w http.ResponseWriter, r *http.Request, puzzle []taquin) {
+func solveHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		var template = template.Must(template.ParseFiles("template/solve.html"))
 		template.Execute(w, nil)
@@ -88,20 +92,20 @@ func solveHandler(w http.ResponseWriter, r *http.Request, puzzle []taquin) {
 	}
 }
 
-func deleteHandler(w http.ResponseWriter, r *http.Request, puzzles *[]taquin) {
+func deleteHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
 	ID := r.FormValue("ID")
-	removePuzzles(puzzles, ID)
+	removeData(ID)
 
 	var template = template.Must(template.ParseFiles("template/delete.html"))
 	template.Execute(w, ID)
 }
 
-func gui(puzzles *[]taquin) {
+func gui() {
 	fs := http.FileServer(http.Dir("assets"))
 
 	mux := http.NewServeMux()
@@ -109,26 +113,11 @@ func gui(puzzles *[]taquin) {
 
 	mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
 	mux.HandleFunc("/", indexHandler)
-
-	mux.HandleFunc("/play", func(w http.ResponseWriter, r *http.Request) {
-		playHandler(w, r, *puzzles)
-	})
-
-	mux.HandleFunc("/solve", func(w http.ResponseWriter, r *http.Request) {
-		solveHandler(w, r, *puzzles)
-	})
-
-	mux.HandleFunc("/delete", func(w http.ResponseWriter, r *http.Request) {
-		deleteHandler(w, r, puzzles)
-	})
-
-	mux.HandleFunc("/show", func(w http.ResponseWriter, r *http.Request) {
-		showHandler(w, r, *puzzles)
-	})
-
-	mux.HandleFunc("/load", func(w http.ResponseWriter, r *http.Request) {
-		loadHandler(w, r, puzzles)
-	})
+	mux.HandleFunc("/show", showHandler)
+	mux.HandleFunc("/load", loadHandler)
+	mux.HandleFunc("/play", playHandler)
+	mux.HandleFunc("/solve", solveHandler)
+	mux.HandleFunc("/delete", deleteHandler)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	mux.HandleFunc("/quit", func(w http.ResponseWriter, r *http.Request) {

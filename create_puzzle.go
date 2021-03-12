@@ -1,11 +1,11 @@
 package main
 
-func createPuzzleTest(ID string, size uint8) taquin {
+func createPuzzleTest(ID string, size uint8) (taquin, metaTaquin) {
+	var meta metaTaquin
 	var puzzle taquin
 
 	nPuzzle := make([][]uint16, size)
 	puzzle.Size = size
-	puzzle.ID = ID
 
 	puzzle.Voidpos.X = 0
 	puzzle.Voidpos.Y = 0
@@ -17,6 +17,8 @@ func createPuzzleTest(ID string, size uint8) taquin {
 	}
 
 	puzzle.Taquin = nPuzzle
+	meta.ID = ID
+	meta.TaquinStruct = puzzle
 
-	return puzzle
+	return puzzle, meta
 }

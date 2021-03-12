@@ -53,7 +53,7 @@ func checkOddTaquin(inversion uint16) bool {
 }
 
 func checkEvenTaquin(puzzle taquin, inversion uint16) bool {
-	var voidPosRaw uint8 = puzzle.Voidpos.X
+	var voidPosRaw uint8 = puzzle.Voidpos.Y
 
 	if voidPosRaw%2 == 1 && inversion%2 == 0 || voidPosRaw%2 == 0 && inversion%2 == 1 {
 		return true
@@ -62,17 +62,17 @@ func checkEvenTaquin(puzzle taquin, inversion uint16) bool {
 	return false
 }
 
-func isValidTaquin(puzzle taquin) bool {
+func isValidTaquin(ID string, puzzle taquin) bool {
 	var taquinArray []uint16 = convertTaquinToArray(puzzle.Taquin)
 	var inversion uint16 = getInversionNumber(taquinArray)
 
 	if !checkTaquinValues(taquinArray) {
-		println("n-puzzle:", puzzle.ID, "values are incorrect.")
+		println("n-puzzle:", ID, "values are incorrect.")
 		return false
 	}
 
 	if puzzle.Size%2 == 1 && !checkOddTaquin(inversion) || puzzle.Size%2 == 0 && !checkEvenTaquin(puzzle, inversion) {
-		println("n-puzzle:", puzzle.ID, "is unsolvable.")
+		println("n-puzzle:", ID, "is unsolvable.")
 		return false
 	}
 

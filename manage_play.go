@@ -7,7 +7,7 @@ import (
 	"github.com/eiannone/keyboard"
 )
 
-func startGame(puzzle taquin) {
+func startGame(ID string, puzzle taquin) {
 	println("Welcome in the play room ! Rules are easy, press ARROW keys to move the puzzle, ENTER to valide your puzzle or ESC to quit.\nYou are using the next puzzle.")
 
 	startTime := time.Now().Unix()
@@ -44,9 +44,9 @@ func startGame(puzzle taquin) {
 			move_down(&puzzle)
 			plays++
 		case keyboard.KeyEnter:
-			if calc_heuristic_manhattan_distance(&puzzle) == 0 {
+			if is_taquin_completed(&puzzle) {
 				endTime := time.Now().Unix()
-				println("Well play ! You solved the puzzle:", puzzle.ID)
+				println("Well play ! You solved the puzzle:", ID)
 				println("You did", plays, "plays in", endTime-startTime, "seconds")
 				taquinSolve = true
 			} else {
@@ -61,12 +61,12 @@ func startGame(puzzle taquin) {
 	}
 }
 
-func playCmd(puzzles []taquin, args []string) {
+func playCmd(args []string) {
 	if len(args) > 0 {
-		for i, puzzle := range puzzles {
-			if (puzzles)[i].ID == args[0] {
-				startGame(puzzle)
-				(puzzles)[i] = puzzle
+		for _, data := range globalData {
+			if data.ID == args[0] {
+				cpy := createPuzzleCopy(data.TaquinStruct)
+				startGame(data.ID, cpy)
 			}
 		}
 	}

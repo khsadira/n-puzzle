@@ -74,30 +74,31 @@ func convertFileToPuzzle(file io.Reader) (taquin, error) {
 	return puzzle, nil
 }
 
-func loadFilePuzzleToPuzzles(puzzles *[]taquin, file *os.File, arg string) {
-	var puzzle taquin
+func loadFileDataToGlobalData(file *os.File, arg string) {
+	var data metaTaquin
+	var err error
 
-	puzzle, err := convertFileToPuzzle(file)
+	data.TaquinStruct, err = convertFileToPuzzle(file)
 	if err != nil {
 		println("n-puzzle: load:", arg, err.Error())
 		return
 	}
 
-	puzzle.Voidpos, err = getVoidPosTaquin(puzzle.Taquin, puzzle.Size)
+	data.TaquinStruct.Voidpos, err = getVoidPosTaquin(data.TaquinStruct.Taquin, data.TaquinStruct.Size)
 
 	if err != nil {
 		println("n-puzzle: load:", arg, err.Error())
 		return
 	}
 
-	puzzle.ID = filepath.Base(arg)
+	data.ID = filepath.Base(arg)
 
-	if isValidTaquin(puzzle) {
-		appendPuzzleToPuzzles(puzzles, puzzle)
+	if isValidTaquin(data.ID, data.TaquinStruct) {
+		appendDataToGlobalData(data)
 	}
 }
 
-func loadCmd(puzzles *[]taquin, args []string) {
+func loadCmd(args []string) {
 	var file *os.File
 	var err error
 
@@ -110,6 +111,6 @@ func loadCmd(puzzles *[]taquin, args []string) {
 		}
 
 		defer file.Close()
-		loadFilePuzzleToPuzzles(puzzles, file, arg)
+		loadFileDataToGlobalData(file, arg)
 	}
 }

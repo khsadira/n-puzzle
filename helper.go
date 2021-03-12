@@ -14,8 +14,11 @@ func getVoidPosTaquin(taquin [][]uint16, size uint8) (Vector2D, error) {
 	for i = 0; i < size; i++ {
 		for j = 0; j < size; j++ {
 			if taquin[i][j] == 0 {
-				voidpos.X = i
-				voidpos.Y = j
+				if size == 2 {
+					println(i, j)
+				}
+				voidpos.Y = i
+				voidpos.X = j
 				return voidpos, nil
 			}
 		}
@@ -23,16 +26,16 @@ func getVoidPosTaquin(taquin [][]uint16, size uint8) (Vector2D, error) {
 	return voidpos, errors.New("puzzle not well formatted.")
 }
 
-func appendPuzzleToPuzzles(puzzles *[]taquin, puzzleToAdd taquin) {
-	for _, puzzle := range *puzzles {
-		if puzzle.ID == puzzleToAdd.ID {
-			println("n-puzzle: error: Failed to add", puzzleToAdd.ID, "due to a similar ID finded.")
+func appendDataToGlobalData(dataToAdd metaTaquin) {
+	for _, data := range globalData {
+		if data.ID == dataToAdd.ID {
+			println("n-puzzle: error: Failed to add", dataToAdd.ID, "due to a similar ID finded.")
 			return
 		}
 	}
 
-	*puzzles = append(*puzzles, puzzleToAdd)
-	println("n-puzze:", puzzleToAdd.ID, "added to puzzles.")
+	globalData = append(globalData, dataToAdd)
+	println("n-puzzle:", dataToAdd.ID, "added to global data puzzles.")
 }
 
 func showPuzzle(puzzle taquin) {
@@ -64,11 +67,29 @@ func isTaquinSolved(puzzle taquin) bool {
 	return true
 }
 
-func removePuzzles(puzzles *[]taquin, ID string) {
-	for i := 0; i < len(*puzzles); i++ {
-		if (*puzzles)[i].ID == ID {
-			*puzzles = append((*puzzles)[:i], (*puzzles)[i+1:]...)
-			println("n-puzzle:", ID, "deleted with success.")
+func removeData(ID string) {
+	for i, data := range globalData {
+		if data.ID == ID {
+			globalData = append(globalData[:i], globalData[i+1:]...)
 		}
 	}
+}
+
+func createPuzzleCopy(t taquin) taquin {
+	var cpy taquin
+
+	cpy.Size = t.Size
+	cpy.Voidpos = Vector2D{
+		X: t.Voidpos.X,
+		Y: t.Voidpos.Y}
+
+	cpy.Taquin = make([][]uint16, len(t.Taquin))
+	for i := 0; i < len(t.Taquin); i++ {
+		cpy.Taquin[i] = make([]uint16, len(t.Taquin[i]))
+		for j := 0; j < len(t.Taquin[i]); j++ {
+			cpy.Taquin[i][j] = t.Taquin[i][j]
+		}
+	}
+
+	return cpy
 }

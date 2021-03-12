@@ -1,104 +1,39 @@
 package main
 
 func main() {
-	var puzzles []taquin
+	var puzzle taquin
+	var meta metaTaquin
 
-	// var puzzle taquin
+	puzzle, meta = createPuzzleTest("n-puzzle-1x1", 1)
+	puzzle.Size = 1
+	if isValidTaquin("n-puzzle-1x1", puzzle) {
+		appendDataToGlobalData(meta)
+	}
 
-	// puzzle = createPuzzleTest("n-puzzle-1x1", 1)
-	// puzzle.Size = 1
-	// if isValidTaquin(puzzle) {
-	// 	appendPuzzleToPuzzles(&puzzles, puzzle)
-	// }
+	puzzle, meta = createPuzzleTest("n-puzzle-1x1", 1)
+	puzzle.Size = 1
+	if isValidTaquin("n-puzzle-1x1", puzzle) {
+		appendDataToGlobalData(meta)
+	}
 
-	// puzzle = createPuzzleTest("n-puzzle-1x1", 1)
-	// puzzle.Size = 1
-	// if isValidTaquin(puzzle) {
-	// 	appendPuzzleToPuzzles(&puzzles, puzzle)
-	// }
+	showPuzzle(puzzle)
+	puzzle, meta = createPuzzleTest("n-puzzle-2x2", 2)
+	puzzle.Size = 2
+	if isValidTaquin("n-puzzle-2x2", puzzle) {
+		appendDataToGlobalData(meta)
+	}
 
-	// showPuzzle(puzzle)
-	// puzzle = createPuzzleTest("n-puzzle-2x2", 2)
-	// puzzle.Size = 2
-	// if isValidTaquin(puzzle) {
-	// 	appendPuzzleToPuzzles(&puzzles, puzzle)
-	// }
+	puzzle, meta = createPuzzleTest("n-puzzle-5x5", 5)
+	puzzle.Size = 5
+	if isValidTaquin("n-puzzle-5x5", puzzle) {
+		appendDataToGlobalData(meta)
+	}
 
-	// puzzle = createPuzzleTest("n-puzzle-4x4", 4)
-	// showPuzzle(puzzle)
-	// puzzle.Size = 4
-	// if isValidTaquin(puzzle) {
-	// 	appendPuzzleToPuzzles(&puzzles, puzzle)
-	// }
-
-	// puzzle = createPuzzleTest("n-puzzle-5x5", 5)
-	// puzzle.Size = 5
-	// if isValidTaquin(puzzle) {
-	// 	appendPuzzleToPuzzles(&puzzles, puzzle)
-	// }
-
-	// puzzle = createPuzzleTest("n-puzzle-5x5-2", 5)
-	// puzzle.Size = 5
-	// if isValidTaquin(puzzle) {
-	// 	appendPuzzleToPuzzles(&puzzles, puzzle)
-	// }
-
-	// puzzle = createPuzzleTest("n-puzzle-5x5-3", 5)
-	// puzzle.Size = 5
-	// if isValidTaquin(puzzle) {
-	// 	appendPuzzleToPuzzles(&puzzles, puzzle)
-	// }
-
-	// puzzle = createPuzzleTest("n-puzzle-3x3", 3)
-	// puzzle.Size = 3
-	// if isValidTaquin(puzzle) {
-	// 	appendPuzzleToPuzzles(&puzzles, puzzle)
-	// }
-
-	// puzzle = createPuzzleTest("n-puzzle-3x3-3", 3)
-	// puzzle.Size = 3
-	// if isValidTaquin(puzzle) {
-	// 	appendPuzzleToPuzzles(&puzzles, puzzle)
-	// }
-
-	// puzzle = createPuzzleTest("n-puzzle-3x3-2", 3)
-	// puzzle.Size = 3
-	// if isValidTaquin(puzzle) {
-	// 	appendPuzzleToPuzzles(&puzzles, puzzle)
-	// }
-
-	// puzzle = createPuzzleTest("n-puzzle-1x1", 1)
-	// puzzle.Size = 1
-	// if isValidTaquin(puzzle) {
-	// 	appendPuzzleToPuzzles(&puzzles, puzzle)
-	// }
-
-	// // puzzle = createPuzzleTest("n-puzzle-15x15", 15)
-	// // puzzle.Size = 15
-	// // if isValidTaquin(puzzle) {
-	// // 	appendPuzzleToPuzzles(&puzzles, puzzle)
-	// // }
-
-	// puzzle = createPuzzleTest("n-puzzle-15x15-2", 15)
-	// puzzle.Size = 15
-	// if isValidTaquin(puzzle) {
-	// 	appendPuzzleToPuzzles(&puzzles, puzzle)
-	// }
-
-	// puzzle = createPuzzleTest("n-puzzle-test2", 2)
-	// showPuzzle(puzzle)
-	// puzzle.Size = 2
-
-	// if isValidTaquin(puzzle) {
-	// 	appendPuzzleToPuzzles(&puzzles, puzzle)
-	// }
-
-	// // puzzle = createPuzzleTest("n-puzzle-17x17", 17)
-	// // showPuzzle(puzzle)
-	// // puzzle.Size = 17
-	// // if isValidTaquin(puzzle) {
-	// // 	appendPuzzleToPuzzles(&puzzles, puzzle)
-	// // }
+	puzzle, meta = createPuzzleTest("n-puzzle-3x3", 3)
+	puzzle.Size = 3
+	if isValidTaquin("n-puzzle-3x3", puzzle) {
+		appendDataToGlobalData(meta)
+	}
 
 	for {
 		cmd, args := getUserEntry("> ")
@@ -106,20 +41,32 @@ func main() {
 		switch cmd {
 		case "help":
 			helpCmd(args)
+		case "env":
+			println("heuristic:", heur)
+			println("algorithm:", algo)
 		case "show":
-			showCmd(puzzles, args)
+			showCmd(args)
 		case "load":
-			loadCmd(&puzzles, args)
+			loadCmd(args)
 		case "unload":
-			unloadCmd(&puzzles, args)
+			unloadCmd(args)
+		case "set":
+			setCmd(args)
 		case "gui": // to be reworkd
-			gui(&puzzles)
+			gui()
 		case "start": // to be deleted
 			start()
 		case "solve":
-			println("solve", args)
+			for _, arg := range args {
+				for _, data := range globalData {
+					if data.ID == arg {
+						cpy := createPuzzleCopy(data.TaquinStruct)
+						algorithm[algo](&cpy)
+					}
+				}
+			}
 		case "play":
-			playCmd(puzzles, args)
+			playCmd(args)
 		case "credentials":
 			credentialsCmd()
 		case "quit":

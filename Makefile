@@ -12,7 +12,9 @@ SRC_FILES		=		main.go\
 						manage_play.go\
 						moves.go\
 						solve.go\
-						webapp.go
+						webapp.go\
+						PriorityQueue.go\
+						set_cmd.go
 
 
 
