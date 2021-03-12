@@ -21,15 +21,10 @@ func checkTaquinValues(taquinArray []uint16) bool {
 		}
 	}
 
-	jmp := 0
-	for i := 0; i < len(taquinArray)-1; i++ {
-		if taquinArray[i]+1 != taquinArray[i+1] {
-			jmp++
+	for i := 0; i < len(taquinArray); i++ {
+		if taquinArray[i] != uint16(i) {
+			return false
 		}
-	}
-
-	if jmp > 1 {
-		return false
 	}
 
 	return true
@@ -71,13 +66,13 @@ func isValidTaquin(puzzle taquin) bool {
 	var taquinArray []uint16 = convertTaquinToArray(puzzle.Taquin)
 	var inversion uint16 = getInversionNumber(taquinArray)
 
-	if puzzle.Size%2 == 1 && !checkOddTaquin(inversion) || puzzle.Size%2 == 0 && !checkEvenTaquin(puzzle, inversion) {
-		println("n-puzzle:", puzzle.ID, "is unsolvable.")
+	if !checkTaquinValues(taquinArray) {
+		println("n-puzzle:", puzzle.ID, "values are incorrect.")
 		return false
 	}
 
-	if !checkTaquinValues(taquinArray) {
-		println("n-puzzle:", puzzle.ID, "values are incorrect.")
+	if puzzle.Size%2 == 1 && !checkOddTaquin(inversion) || puzzle.Size%2 == 0 && !checkEvenTaquin(puzzle, inversion) {
+		println("n-puzzle:", puzzle.ID, "is unsolvable.")
 		return false
 	}
 

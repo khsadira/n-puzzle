@@ -112,7 +112,7 @@ func main() {
 			loadCmd(&puzzles, args)
 		case "unload":
 			unloadCmd(&puzzles, args)
-		case "gui": // to be deleted
+		case "gui": // to be reworkd
 			gui(&puzzles)
 		case "start": // to be deleted
 			start()

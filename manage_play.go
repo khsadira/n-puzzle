@@ -58,9 +58,7 @@ func startGame(puzzle taquin) {
 			fmt.Printf("Press ARROW keys to move the puzzle, ENTER to valide your puzzle or ESC to quit.\n")
 
 		}
-
 	}
-
 }
 
 func playCmd(puzzles []taquin, args []string) {
