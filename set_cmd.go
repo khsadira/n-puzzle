@@ -6,11 +6,14 @@ import (
 )
 
 func setCmd(args []string) {
+	if len(args) == 0 {
+		println("set: usage: set heur=X algo=X")
+	}
 	for _, arg := range args {
 		setArg := strings.Split(arg, "=")
 
 		if len(setArg) != 2 {
-			println("set:", arg, "argument not well formatted.")
+			println("set:", arg, "argument not well formatted. Should be \"set heur=X algo=X\"")
 			continue
 		}
 

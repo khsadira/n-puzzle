@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"strconv"
 )
 
 func print_taquin(t taquin) {
@@ -31,11 +29,4 @@ func generate_taquin(size uint8) taquin {
 	}
 	t.Taquin[size-1][size-1] = 0
 	return t
-}
-
-func start() {
-	i, _ := strconv.ParseInt(os.Args[1], 10, 8)
-	t := generate_taquin(uint8(i))
-	mix_taquin(&t)
-	algorithm[algo](&t)
 }

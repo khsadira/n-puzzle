@@ -14,9 +14,6 @@ func getVoidPosTaquin(taquin [][]uint16, size uint8) (Vector2D, error) {
 	for i = 0; i < size; i++ {
 		for j = 0; j < size; j++ {
 			if taquin[i][j] == 0 {
-				if size == 2 {
-					println(i, j)
-				}
 				voidpos.Y = i
 				voidpos.X = j
 				return voidpos, nil
