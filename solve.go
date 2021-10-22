@@ -10,17 +10,19 @@ import (
 var heuristic [3]Heuristic = [3]Heuristic{calc_heuristic_manhattan_distance, calc_heuritic_euclidian_distance, calc_heuristic_nb_misplaced}
 var algorithm [3]Algorithm = [3]Algorithm{solve_astar, solve_greedysearch, solve_uniform_cost}
 
+var solved taquin
+
 func get_target_pos(val uint16, t *taquin) Vector2D {
-	if val == 0 {
-		return Vector2D{t.Size - 1, t.Size - 1}
-	}
 	var x, y uint8
-	x = uint8(val % uint16(t.Size))
-	if x == 0 {
-		x = t.Size
+
+	for x = 0; x < t.Size; x++ {
+		for y = 0; y < t.Size; y++ {
+			if solved.Taquin[y][x] == val {
+				return Vector2D{x, y}
+			}
+		}
 	}
-	y = uint8(math.Ceil(float64(val) / float64(t.Size)))
-	return Vector2D{x - 1, y - 1}
+	return Vector2D{0,0}
 }
 
 func calc_manhattan_distance(p1 Vector2D, p2 Vector2D) uint16 {
@@ -34,14 +36,12 @@ func calc_euclidian_distance(p1 Vector2D, p2 Vector2D) uint16 {
 func calc_heuritic_euclidian_distance(t *taquin) uint16 {
 	var ret uint16 = 0
 	var i, j uint8
-	var val uint16 = 1
 
 	for i = 0; i < t.Size; i++ {
 		for j = 0; j < t.Size; j++ {
-			if t.Taquin[i][j] != val && t.Taquin[i][j] != 0 {
+			if t.Taquin[i][j] != solved.Taquin[i][j] && t.Taquin[i][j] != 0 {
 				ret += calc_euclidian_distance(Vector2D{j, i}, get_target_pos(t.Taquin[i][j], t))
 			}
-			val++
 		}
 	}
 	return ret
@@ -50,14 +50,12 @@ func calc_heuritic_euclidian_distance(t *taquin) uint16 {
 func calc_heuristic_manhattan_distance(t *taquin) uint16 {
 	var ret uint16 = 0
 	var i, j uint8
-	var val uint16 = 1
 
 	for i = 0; i < t.Size; i++ {
 		for j = 0; j < t.Size; j++ {
-			if t.Taquin[i][j] != val && t.Taquin[i][j] != 0 {
+			if t.Taquin[i][j] != solved.Taquin[i][j] && t.Taquin[i][j] != 0 {
 				ret += calc_manhattan_distance(Vector2D{j, i}, get_target_pos(t.Taquin[i][j], t))
 			}
-			val++
 		}
 	}
 	return ret
@@ -66,14 +64,12 @@ func calc_heuristic_manhattan_distance(t *taquin) uint16 {
 func calc_heuristic_nb_misplaced(t *taquin) uint16 {
 	var ret uint16 = 0
 	var i, j uint8
-	var val uint16 = 1
 
 	for i = 0; i < t.Size; i++ {
 		for j = 0; j < t.Size; j++ {
-			if t.Taquin[i][j] != val && t.Taquin[i][j] != 0 {
+			if t.Taquin[i][j] != solved.Taquin[i][j] && t.Taquin[i][j] != 0 {
 				ret++
 			}
-			val++
 		}
 	}
 	return ret
@@ -131,17 +127,12 @@ func taquin_to_string(t *taquin) string {
 
 func is_taquin_completed(t *taquin) bool {
 	var i, j uint8
-	var val uint16 = 1
 
 	for i = 0; i < t.Size; i++ {
 		for j = 0; j < t.Size; j++ {
-			if i == t.Size-1 && j == t.Size-1 {
-				break
-			}
-			if t.Taquin[i][j] != val {
+			if t.Taquin[i][j] != t.Taquin[i][j] {
 				return false
 			}
-			val++
 		}
 	}
 	return true
@@ -191,6 +182,7 @@ func solve_astar(t *taquin) {
 	var newItem *Item
 
 	print_taquin(*t)
+	solved = generate_taquin(t.Size)
 	complexity_time := 0
 	complexity_size := 0
 	close_list := make(map[string]opti)
@@ -232,6 +224,7 @@ func solve_uniform_cost(t *taquin) {
 	var completed bool = false
 
 	print_taquin(*t)
+	solved = generate_taquin(t.Size)
 	complexity_time := 0
 	complexity_size := 0
 	close_list := make(map[string]opti)
@@ -273,6 +266,7 @@ func solve_greedysearch(t *taquin) {
 	var newItem *Item
 
 	print_taquin(*t)
+	solved = generate_taquin(t.Size)
 	complexity_time := 0
 	complexity_size := 0
 	close_list := make(map[string]opti)
