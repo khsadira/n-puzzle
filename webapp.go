@@ -8,8 +8,6 @@ import (
 	"net/http"
 )
 
-//set error to template
-
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	var template = template.Must(template.ParseFiles("template/index.html"))
 	template.Execute(w, nil)
@@ -27,7 +25,7 @@ func loadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	const maxUploadSize = 2 * 1024 * 1024 // 2mb
+	const maxUploadSize = 2 * 1024 * 1024
 
 	if err := r.ParseMultipartForm(maxUploadSize); err != nil {
 		fmt.Printf("Could not parse multipart form: %v\n", err)

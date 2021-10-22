@@ -20,7 +20,7 @@ func main() {
 			unloadCmd(args)
 		case "set":
 			setCmd(args)
-		case "gui": // to be reworkd
+		case "gui":
 			gui()
 		case "solve":
 			for _, arg := range args {
