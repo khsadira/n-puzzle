@@ -45,25 +45,6 @@ func showPuzzle(puzzle taquin) {
 	}
 }
 
-func isTaquinSolved(puzzle taquin) bool {
-	var taquinArray []uint16 = convertTaquinToArray(puzzle.Taquin)
-	jmp := 0
-
-	fmt.Printf("%v\n", taquinArray)
-	if taquinArray[0] != 0 {
-		return false
-	}
-	for i := 0; i < len(taquinArray)-1; i++ {
-		if taquinArray[i]+1 != taquinArray[i+1] {
-			jmp++
-		}
-	}
-	if jmp > 1 {
-		return false
-	}
-	return true
-}
-
 func removeData(ID string) {
 	for i, data := range globalData {
 		if data.ID == ID {

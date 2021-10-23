@@ -130,7 +130,7 @@ func is_taquin_completed(t *taquin) bool {
 
 	for i = 0; i < t.Size; i++ {
 		for j = 0; j < t.Size; j++ {
-			if t.Taquin[i][j] != t.Taquin[i][j] {
+			if t.Taquin[i][j] != solved.Taquin[i][j] {
 				return false
 			}
 		}

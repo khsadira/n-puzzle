@@ -26,6 +26,74 @@
 <script>
   var count = 0;
 
+  function generate_taquin(size) {
+	var i = 0
+    var j = 0
+	var tmp = 1
+	var offset = 0
+    var t = []
+    
+    for (i = 0; i < size; i++) {
+        var stock = []
+
+        for (j = 0; j < size ; j++) {
+            stock.push(0)
+        }
+
+        t.push(stock)
+    }
+    
+    i = 0;
+    j = 0;
+	voidposX = parseInt((size-1) / 2)
+    voidposY = parseInt(size / 2)
+
+	while (i != voidposY || j != voidposX) {
+		if (i == offset && j == offset) {
+			while (j < size-offset-1) {
+				t[i][j] = tmp
+				tmp++
+				j++
+			}
+		} else if (i == offset && j == size-1-offset) {
+			while (i < size-offset-1) {
+				t[i][j] = tmp
+				tmp++
+				i++
+			}
+		} else if (i == size-1-offset && j == size-1-offset) {
+			while (j > offset) {
+				t[i][j] = tmp
+				tmp++
+				j--
+			}
+		} else if (i == size-1-offset && j == offset) {
+			while (i > offset) {
+				t[i][j] = tmp
+				tmp++
+				i--
+			}
+			offset++
+			i = offset
+			j = offset
+		}
+	}
+	t[voidposY][voidposX] = 0
+
+    var finalArray = []
+    var k = 0
+    i = 0
+    while (i < size) {
+        j = 0
+        while (j < size) {
+            finalArray[k++] = t[i][j]
+            j++
+        }
+        i++
+    }
+	return finalArray
+}
+
   function getArray() {
     var array = []
       {{range .TaquinStruct.Taquin}}
@@ -64,12 +132,12 @@
     }
   }
 
-  function setClass() {
+  function setClass(validTaquin) {
     var elements = document.getElementsByClassName("n-puzzle");
     for (var i = 0; i < elements.length; i++) {
       var childs = elements[i].getElementsByTagName('li')
       for (var j = 0; j < childs.length; j++) {
-        var correct = j + 1 == childs[j].innerText;
+        var correct = parseInt(validTaquin[j]) == parseInt(childs[j].innerText);
         var cssClass = childs[j].innerText == 0 ? "empty" : (correct ? "correct" : "incorrect");
         childs[j].className=cssClass
       }
@@ -77,9 +145,12 @@
   }
 
   function printTaquin(array) {
+    var validTaquin = generate_taquin({{.TaquinStruct.Size}})
+
+    console.log("valid:", validTaquin)
     printPuzzle(array)
     setPuzzleSize()
-    setClass()
+    setClass(validTaquin)
   }
 
   function erasePuzzle() {
@@ -91,9 +162,10 @@
   }
 
   function isValid(array) {
+    var validTaquin = generate_taquin({{.TaquinStruct.Size}})
     var isValid = 0
     for (var i = 0; i < array.length; i++) {
-          if (i + 1 != array[i] && array[i] != 0) {
+          if (array[i] != validTaquin[i]) {
             isValid = 1
         }
     }

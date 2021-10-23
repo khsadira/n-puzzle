@@ -7,6 +7,21 @@ import (
 	"github.com/eiannone/keyboard"
 )
 
+func is_taquin_completed_play(t *taquin) bool {
+	var i, j uint8
+	solved := generate_taquin(t.Size)
+
+
+	for i = 0; i < t.Size; i++ {
+		for j = 0; j < t.Size; j++ {
+			if t.Taquin[i][j] != solved.Taquin[i][j] {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 func startGame(ID string, puzzle taquin) {
 	println("Welcome in the play room ! Rules are easy, press ARROW keys to move the puzzle, ENTER to valide your puzzle or ESC to quit.\nYou are using the next puzzle.")
 
@@ -44,7 +59,7 @@ func startGame(ID string, puzzle taquin) {
 			move_down(&puzzle)
 			plays++
 		case keyboard.KeyEnter:
-			if is_taquin_completed(&puzzle) {
+			if is_taquin_completed_play(&puzzle) {
 				endTime := time.Now().Unix()
 				println("Well play ! You solved the puzzle:", ID)
 				println("You did", plays, "plays in", endTime-startTime, "seconds")
