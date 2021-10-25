@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -13,7 +14,7 @@ import (
 func strToMapInt(line string, size uint8) ([]uint16, error) {
 	var err error = nil
 
-	strs := strings.Split(line, " ")
+	strs := strings.Fields(line)
 	strlens := len(strs)
 
 	if uint8(strlens) != size {
@@ -34,6 +35,13 @@ func strToMapInt(line string, size uint8) ([]uint16, error) {
 	return ary, nil
 }
 
+func removeComment(line string) string {
+	ret := strings.Split(line, "#")
+	space := regexp.MustCompile(`\s+`)
+	s := space.ReplaceAllString(ret[0], " ")
+	return s
+}
+
 func convertFileToPuzzle(file io.Reader) (taquin, error) {
 	var puzzle taquin
 	var err error
@@ -44,9 +52,13 @@ func convertFileToPuzzle(file io.Reader) (taquin, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 
+		if len(line) == 0 || line[0] == '#' {
+			continue
+		}
 		if i == 0 {
 			var size64 uint64
 
+			line = removeComment(line)
 			size64, err = strconv.ParseUint(line, 10, 64)
 
 			if err != nil || size64 <= 0 {
@@ -58,6 +70,7 @@ func convertFileToPuzzle(file io.Reader) (taquin, error) {
 		} else if i > puzzle.Size {
 			return puzzle, errors.New("puzzle not well formatted.")
 		} else {
+			line = removeComment(line)
 			puzzle.Taquin[i-1], err = strToMapInt(line, puzzle.Size)
 
 			if err != nil {
